@@ -9,4 +9,6 @@ Test on MacBook ok!
 ![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/result.gif)
 
 # usage
-Adjust the value of input_string and run.
+```bash
+python3 app.py -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此誠危急存亡之秋也。"
+```
