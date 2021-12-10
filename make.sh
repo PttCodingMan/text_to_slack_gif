@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-pyinstaller -F app.py
+pyinstaller src/app.spec
