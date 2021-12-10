@@ -10,7 +10,7 @@ Test on MacBook ok!
 
 # usage
 
-Download app.zip from Releases.
+Download app.zip from [Releases](https://github.com/PttCodingMan/text_to_slack_gif/releases).
 ```bash
 ./app -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此誠危急存亡之秋也。"
 ```
