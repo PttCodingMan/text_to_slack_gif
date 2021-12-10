@@ -1,5 +1,3 @@
-import datetime
-import io
 import string
 from argparse import ArgumentParser
 
@@ -48,8 +46,7 @@ if __name__ == '__main__':
         # draw text in image
         d.text((start_x, -20), text, fill='black', font=font)
 
-        # write image to file
-        # for debug
+        # write image to file for debug
         # s = io.BytesIO()
         # img.save(s, 'png')
         # in_memory_file = s.getvalue()
@@ -59,10 +56,8 @@ if __name__ == '__main__':
 
         images.append(img)
 
-    # img, *imgs = [Image.open(f) for f in sorted(glob.glob('*.png'))]
-    # print(imgs)
-
-    img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
-    img.save(fp=f'{input_string}.gif', format='GIF', append_images=images, save_all=True, duration=delay, loop=0)
+    images.append(Image.new('RGB', (image_size, image_size), (255, 255, 255)))
+    images[0].save(fp=f'{input_string}.gif', format='GIF', append_images=images[1:], save_all=True, duration=delay,
+                   loop=0)
 
     logger.info(f'{input_string}.gif', 'generated')
