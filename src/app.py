@@ -29,6 +29,7 @@ if __name__ == '__main__':
     font = ImageFont.truetype('/System/Library/Fonts/Arial Unicode.ttf', image_size, index=0)
 
     images = []
+    images.append(Image.new('RGB', (image_size, image_size), (255, 255, 255)))
     for i, text in enumerate(input_string):
 
         logger.debug('text', text)
@@ -60,7 +61,6 @@ if __name__ == '__main__':
         #     f.write(in_memory_file)
 
         images.append(img)
-
     images.append(Image.new('RGB', (image_size, image_size), (255, 255, 255)))
 
     output_img = []
