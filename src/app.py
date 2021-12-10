@@ -15,10 +15,14 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
     parser.add_argument('-t', '--text', help="any text you want to convert to gif")
+    parser.add_argument('-f', '--frame', default=4, help="frames number for each text between text")
+    parser.add_argument('-d', '--delay', default=100, help="delay for each frame")
     args = parser.parse_args()
 
     logger.info('text', args.text)
     input_string = args.text
+    frame = args.frame
+    delay = args.delay
 
     image_size = 100
     # load font
