@@ -1,4 +1,4 @@
-# text to gif
+# text to slack gif
 
 This is a simple python script that can automatically convert the entered text into slack gif.
 
