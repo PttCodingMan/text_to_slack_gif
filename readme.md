@@ -18,7 +18,7 @@ or run python script.
 python3 app.py -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此誠危急存亡之秋也。"
 ```
 ## Advanced usage
-However, you can get different type gif by adjusting frame and delay.
+However, you can get different type gif by adjusting frame and delay.  
 The default values for frame and delay are 4 and 100 respectively.
 ```bash
 python3 app.py -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此 誠危急存亡之秋也。"
