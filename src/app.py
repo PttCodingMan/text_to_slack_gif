@@ -28,8 +28,7 @@ if __name__ == '__main__':
     # load font
     font = ImageFont.truetype('/System/Library/Fonts/Arial Unicode.ttf', image_size, index=0)
 
-    images = []
-    images.append(Image.new('RGB', (image_size, image_size), (255, 255, 255)))
+    images = [Image.new('RGB', (image_size, image_size), (255, 255, 255))]
     for i, text in enumerate(input_string):
 
         logger.debug('text', text)
@@ -63,24 +62,23 @@ if __name__ == '__main__':
         images.append(img)
     images.append(Image.new('RGB', (image_size, image_size), (255, 255, 255)))
 
-    output_img = []
-    output_img.append(images[0])
+    output_img = [images[0]]
     for i, image in enumerate(images[:-1]):
 
         for f in range(1, frame):
-
             img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
-            w_crop_size_before = f * image_size//frame
+            w_crop_size_before = f * image_size // frame
             w_crop_size_after = image_size - w_crop_size_before
-            img.paste(image.crop((w_crop_size_before,0,image_size,image_size)), (0, 0))
-            img.paste(images[i+1].crop((0,0,w_crop_size_before,image_size)), (w_crop_size_after, 0))
+            img.paste(image.crop((w_crop_size_before, 0, image_size, image_size)), (0, 0))
+            img.paste(images[i + 1].crop((0, 0, w_crop_size_before, image_size)), (w_crop_size_after, 0))
             output_img.append(img)
 
-        output_img.append(images[i+1])
+        output_img.append(images[i + 1])
 
     output_img.append(images[-1])
 
-    output_img[0].save(fp=f'{input_string}.gif', format='GIF', append_images=output_img[1:], save_all=True, duration=delay,
-                   loop=0)
+    output_img[0].save(fp=f'{input_string}.gif', format='GIF', append_images=output_img[1:], save_all=True,
+                       duration=delay,
+                       loop=0)
 
     logger.info(f'{input_string}.gif', 'generated')
