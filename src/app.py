@@ -64,7 +64,6 @@ if __name__ == '__main__':
     images.append(Image.new('RGB', (image_size, image_size), (255, 255, 255)))
 
     output_img = []
-    output_img.append(images[0])
     for i, image in enumerate(images[:-1]):
 
         for f in range(1, frame):
@@ -80,7 +79,7 @@ if __name__ == '__main__':
 
     output_img.append(images[-1])
 
-    output_img[0].save(fp=f'{input_string}.gif', format='GIF', append_images=output_img[1:], save_all=True, duration=delay,
+    output_img[1].save(fp=f'{input_string}.gif', format='GIF', append_images=output_img[2:], save_all=True, duration=delay,
                    loop=0)
 
     logger.info(f'{input_string}.gif', 'generated')
