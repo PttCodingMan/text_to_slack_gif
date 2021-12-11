@@ -62,6 +62,8 @@ if __name__ == '__main__':
         d.text((start_x, -20), text, fill='black', font=font)
 
         # write image to file for debug
+        # import io
+        # 
         # s = io.BytesIO()
         # img.save(s, 'png')
         # in_memory_file = s.getvalue()
@@ -87,8 +89,8 @@ if __name__ == '__main__':
 
     output_img.append(images[-1])
 
-    output_img[1].save(
-        fp=f'{input_string}.gif', format='GIF', append_images=output_img[2:], save_all=True,
+    output_img[0].save(
+        fp=f'{input_string}.gif', format='GIF', append_images=output_img[1:], save_all=True,
         duration=delay,
         loop=0)
 
