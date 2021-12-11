@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
         # write image to file for debug
         # import io
-        # 
+        #
         # s = io.BytesIO()
         # img.save(s, 'png')
         # in_memory_file = s.getvalue()
@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
         output_img.append(images[i + 1])
 
-    output_img.append(images[-1])
+    output_img.pop()
 
     output_img[0].save(
         fp=f'{input_string}.gif', format='GIF', append_images=output_img[1:], save_all=True,
