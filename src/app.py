@@ -1,29 +1,38 @@
 import string
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
+from PIL import ImageFont, Image, ImageDraw
 from SingleLog.log import Logger
 
 input_string = None
 delay = 100
 frame = 4
 
+
+def check_positive(value):
+    ivalue = int(value)
+    if ivalue <= 0:
+        raise ArgumentTypeError("%s is an invalid positive int value" % value)
+    return ivalue
+
+
 if __name__ == '__main__':
     logger = Logger('app')
 
     parser = ArgumentParser()
-    parser.add_argument('-t', '--text', help="any text you want to convert to gif")
-    parser.add_argument('-f', '--frame', type=int, default=5, choices=range(1, 41),
-                        help="frames number for each text between text")
-    parser.add_argument('-d', '--delay', default=100, choices=range(1, 101), help="delay for each frame")
+    parser.add_argument('-t', '--text', help="Any text you want to convert to gif", required=True)
+    parser.add_argument('-f', '--frame', type=check_positive, default=5,
+                        help="Frames number for each text between text")
+    parser.add_argument('-d', '--delay', type=check_positive, default=100, help="The delay for each frame")
     args = parser.parse_args()
 
-    logger.info('text', args.text)
     input_string = args.text
     frame = args.frame
     delay = args.delay
+
+    logger.debug('text', args.text)
+    logger.debug('frame', frame)
+    logger.debug('delay', delay)
 
     image_size = 100
     # load font
@@ -78,7 +87,9 @@ if __name__ == '__main__':
 
     output_img.append(images[-1])
 
-    output_img[1].save(fp=f'{input_string}.gif', format='GIF', append_images=output_img[2:], save_all=True, duration=delay,
-                   loop=0)
+    output_img[1].save(
+        fp=f'{input_string}.gif', format='GIF', append_images=output_img[2:], save_all=True,
+        duration=delay,
+        loop=0)
 
     logger.info(f'{input_string}.gif', 'generated')
