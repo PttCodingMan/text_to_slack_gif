@@ -15,8 +15,9 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
     parser.add_argument('-t', '--text', help="any text you want to convert to gif")
-    parser.add_argument('-f', '--frame', default=4, help="frames number for each text between text")
-    parser.add_argument('-d', '--delay', default=100, help="delay for each frame")
+    parser.add_argument('-f', '--frame', type=int, default=5, choices=range(1, 41),
+                        help="frames number for each text between text")
+    parser.add_argument('-d', '--delay', default=100, choices=range(1, 101), help="delay for each frame")
     args = parser.parse_args()
 
     logger.info('text', args.text)
