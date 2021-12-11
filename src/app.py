@@ -89,9 +89,11 @@ if __name__ == '__main__':
 
     output_img.pop()
 
+    output_name = f'{input_string[:3]} in f {frame} d {delay}.gif'
+
     output_img[0].save(
-        fp=f'{input_string}.gif', format='GIF', append_images=output_img[1:], save_all=True,
+        fp=output_name, format='GIF', append_images=output_img[1:], save_all=True,
         duration=delay,
         loop=0)
 
-    logger.info(f'{input_string}.gif', 'generated')
+    logger.info(output_name, 'generated')
