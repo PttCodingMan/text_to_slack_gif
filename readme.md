@@ -5,7 +5,7 @@
 
 This is a simple Python script that can convert text into gif in slack format, which solves the problem that you need to open several online services and keep converting.
 
-在我的 Mac 上測試 ok!
+在我的 Mac 上測試 ok!  
 Test on MacBook ok!  
 
 ## Basic usage
