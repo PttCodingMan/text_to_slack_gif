@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     x = (frame - 1) * frame_offset
     images = []
-    while abs(x) < text_total_width:
+    while (text_total_width + x) >= frame_offset:
 
         img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
         d = ImageDraw.Draw(img)
@@ -71,9 +71,6 @@ if __name__ == '__main__':
 
         images.append(img)
         x -= frame_offset
-
-    if frame > 1:
-        images.pop()
 
     output_name = f'{input_string[:3]} in f {frame} d {delay}.gif'
 
