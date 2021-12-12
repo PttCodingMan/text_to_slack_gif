@@ -6,9 +6,11 @@ from PIL import ImageFont, Image, ImageDraw
 from SingleLog.log import Logger
 
 # default value
-default_frame = 4
+default_frame = 5
 default_delay = 100
 image_size = 100
+
+logger = Logger('app')
 
 
 def check_positive(value):
@@ -78,7 +80,7 @@ def text_to_gif(text, frame, delay, font, save):
             images.append(images.pop(0))
 
     if save:
-        output_name = f'{input_string} in f {frame} d {delay}.gif'
+        output_name = f'{input_string[:3]} in f {frame} d {delay}.gif'
 
         images[0].save(
             fp=output_name, format='GIF', append_images=images[1:], save_all=True,
@@ -91,7 +93,6 @@ def text_to_gif(text, frame, delay, font, save):
 
 
 if __name__ == '__main__':
-    logger = Logger('app')
 
     parser = ArgumentParser()
     parser.add_argument('-t', '--text', help="Any text you want to convert to gif", required=True)
