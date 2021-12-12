@@ -41,38 +41,54 @@ if __name__ == '__main__':
 
     img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
     d = ImageDraw.Draw(img)
-    text_total_width, _ = d.textsize(input_string, font=font)
 
-    logger.debug('text_total_width', text_total_width)
+    if frame == 1:
+        images = []
+        for i, text in enumerate(input_string):
 
-    frame_offset = single_full_text_length // frame
+            logger.debug('text', text)
+            if text in string.whitespace:
+                logger.debug('pass')
+                continue
 
-    logger.debug('frame_offset', frame_offset)
+            # create image with white
+            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+            d = ImageDraw.Draw(img)
 
-    x = (frame - 1) * frame_offset
-    images = []
-    while (text_total_width + x) >= frame_offset:
+            if text in string.ascii_letters:
+                w, h = d.textsize(text, font=font)
+                start_x = int((image_size - w) / 2)
+            else:
+                start_x = 0
 
-        img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
-        d = ImageDraw.Draw(img)
+            logger.debug('start x', start_x)
+            # draw text in image
+            d.text((start_x, -20), text, fill='black', font=font)
 
-        d.text((x, -20), input_string, fill='black', font=font)
+            images.append(img)
+    else:
+        text_total_width, _ = d.textsize(input_string, font=font)
+        logger.debug('text_total_width', text_total_width)
 
-        # write image to file for debug
-        if logger.level == Logger.TRACE:
-            import io
+        frame_offset = single_full_text_length // frame
+        logger.debug('frame_offset', frame_offset)
 
-            s = io.BytesIO()
-            img.save(s, 'png')
-            in_memory_file = s.getvalue()
+        x = (frame - 1) * frame_offset
+        images = []
+        while (text_total_width + x) >= frame_offset:
 
-            with open(f'{x}.png', 'wb') as f:
-                f.write(in_memory_file)
+            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+            d = ImageDraw.Draw(img)
 
-        images.append(img)
-        x -= frame_offset
+            d.text((x, -20), input_string, fill='black', font=font)
 
-    output_name = f'{input_string[:3]} in f {frame} d {delay}.gif'
+            images.append(img)
+            x -= frame_offset
+
+        for _ in range(frame - 1):
+            images.append(images.pop(0))
+
+    output_name = f'{input_string} in f {frame} d {delay}.gif'
 
     images[0].save(
         fp=output_name, format='GIF', append_images=images[1:], save_all=True,
