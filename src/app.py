@@ -1,3 +1,4 @@
+import platform
 import string
 from argparse import ArgumentParser, ArgumentTypeError
 
@@ -5,8 +6,9 @@ from PIL import ImageFont, Image, ImageDraw
 from SingleLog.log import Logger
 
 # default value
-frame = 4
-delay = 100
+default_frame = 4
+default_delay = 100
+image_size = 100
 
 
 def check_positive(value):
@@ -16,28 +18,16 @@ def check_positive(value):
     return value
 
 
-if __name__ == '__main__':
-    logger = Logger('app')
-
-    parser = ArgumentParser()
-    parser.add_argument('-t', '--text', help="Any text you want to convert to gif", required=True)
-    parser.add_argument('-f', '--frame', type=check_positive, default=5,
-                        help="Frames number for each text between text")
-    parser.add_argument('-d', '--delay', type=check_positive, default=100, help="The delay for each frame")
-    args = parser.parse_args()
-
-    input_string = ''.join(args.text.split())
-    frame = args.frame
-    delay = args.delay
+def text_to_gif(text, frame, delay, font, save):
+    input_string = ''.join(text.split())
 
     logger.debug('text', input_string)
     logger.debug('frame', frame)
     logger.debug('delay', delay)
 
-    image_size = 100
     single_full_text_length = image_size
     # load font
-    font = ImageFont.truetype('/System/Library/Fonts/Arial Unicode.ttf', image_size, index=0)
+    font = ImageFont.truetype(font, image_size, index=0)
 
     img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
     d = ImageDraw.Draw(img)
@@ -76,7 +66,6 @@ if __name__ == '__main__':
         x = (frame - 1) * frame_offset
         images = []
         while (text_total_width + x) >= frame_offset:
-
             img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
             d = ImageDraw.Draw(img)
 
@@ -88,12 +77,34 @@ if __name__ == '__main__':
         for _ in range(frame - 1):
             images.append(images.pop(0))
 
-    output_name = f'{input_string} in f {frame} d {delay}.gif'
+    if save:
+        output_name = f'{input_string} in f {frame} d {delay}.gif'
 
-    images[0].save(
-        fp=output_name, format='GIF', append_images=images[1:], save_all=True,
-        duration=delay,
-        loop=0)
+        images[0].save(
+            fp=output_name, format='GIF', append_images=images[1:], save_all=True,
+            duration=delay,
+            loop=0)
 
-    logger.info(output_name, 'generated')
+        logger.info(output_name, 'generated')
 
+    return images
+
+
+if __name__ == '__main__':
+    logger = Logger('app')
+
+    parser = ArgumentParser()
+    parser.add_argument('-t', '--text', help="Any text you want to convert to gif", required=True)
+    parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
+                        help="Frames number for each text between text")
+    parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
+    args = parser.parse_args()
+
+    if platform.system() == 'Darwin':
+        font = '/System/Library/Fonts/Arial Unicode.ttf'
+    elif platform.system() == 'Windows':
+        font = None
+    elif platform.system() == 'Linux':
+        font = None
+
+    text_to_gif(args.text, args.frame, args.delay, font, True)
