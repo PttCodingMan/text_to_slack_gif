@@ -20,8 +20,10 @@ def check_positive(value):
     return value
 
 
-def text_to_gif(text, frame, delay, font, save):
-    input_string = ''.join(text.split())
+def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
+    while '  ' in text:
+        text = text.replace('  ', ' ')
+    input_string = text
 
     logger.debug('text', input_string)
     logger.debug('frame', frame)
@@ -80,7 +82,7 @@ def text_to_gif(text, frame, delay, font, save):
             images.append(images.pop(0))
 
     if save:
-        output_name = f'{input_string[:3]} in f {frame} d {delay}.gif'
+        output_name = f'{input_string[:5].strip()} in f {frame} d {delay}.gif'
 
         images[0].save(
             fp=output_name, format='GIF', append_images=images[1:], save_all=True,
