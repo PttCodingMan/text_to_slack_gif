@@ -1,85 +1,113 @@
+import platform
 import string
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
+from PIL import ImageFont, Image, ImageDraw
 from SingleLog.log import Logger
 
-input_string = None
-delay = 100
-frame = 4
+# default value
+default_frame = 5
+default_delay = 100
+image_size = 100
+
+logger = Logger('app')
+
+
+def check_positive(value):
+    value = int(value)
+    if value <= 0:
+        raise ArgumentTypeError("%s is an invalid positive int value" % value)
+    return value
+
+
+def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
+    while '  ' in text:
+        text = text.replace('  ', ' ')
+    input_string = text
+
+    logger.debug('text', input_string)
+    logger.debug('frame', frame)
+    logger.debug('delay', delay)
+
+    single_full_text_length = image_size
+    # load font
+    font = ImageFont.truetype(font, image_size, index=0)
+
+    img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+    d = ImageDraw.Draw(img)
+
+    if frame == 1:
+        images = []
+        for i, text in enumerate(input_string):
+
+            logger.debug('text', text)
+            if text in string.whitespace:
+                logger.debug('pass')
+                continue
+
+            # create image with white
+            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+            d = ImageDraw.Draw(img)
+
+            if text in string.ascii_letters:
+                w, h = d.textsize(text, font=font)
+                start_x = int((image_size - w) / 2)
+            else:
+                start_x = 0
+
+            logger.debug('start x', start_x)
+            # draw text in image
+            d.text((start_x, -20), text, fill='black', font=font)
+
+            images.append(img)
+    else:
+        text_total_width, _ = d.textsize(input_string, font=font)
+        logger.debug('text_total_width', text_total_width)
+
+        frame_offset = single_full_text_length // frame
+        logger.debug('frame_offset', frame_offset)
+
+        x = (frame - 1) * frame_offset
+        images = []
+        while (text_total_width + x) >= frame_offset:
+            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+            d = ImageDraw.Draw(img)
+
+            d.text((x, -20), input_string, fill='black', font=font)
+
+            images.append(img)
+            x -= frame_offset
+
+        for _ in range(frame - 1):
+            images.append(images.pop(0))
+
+    if save:
+        output_name = f'{input_string[:5].strip()} in f {frame} d {delay}.gif'
+
+        images[0].save(
+            fp=output_name, format='GIF', append_images=images[1:], save_all=True,
+            duration=delay,
+            loop=0)
+
+        logger.info(output_name, 'generated')
+
+    return images
+
 
 if __name__ == '__main__':
-    logger = Logger('app')
 
     parser = ArgumentParser()
-    parser.add_argument('-t', '--text', help="any text you want to convert to gif")
-    parser.add_argument('-f', '--frame', type=int, default=5, choices=range(1, 41),
-                        help="frames number for each text between text")
-    parser.add_argument('-d', '--delay', default=100, choices=range(1, 101), help="delay for each frame")
+    parser.add_argument('-t', '--text', help="Any text you want to convert to gif", required=True)
+    parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
+                        help="Frames number for each text between text")
+    parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
     args = parser.parse_args()
 
-    logger.info('text', args.text)
-    input_string = args.text
-    frame = args.frame
-    delay = args.delay
+    if platform.system() == 'Darwin':
+        font = '/System/Library/Fonts/Arial Unicode.ttf'
+    elif platform.system() == 'Windows':
+        font = None
+    elif platform.system() == 'Linux':
+        font = None
 
-    image_size = 100
-    # load font
-    font = ImageFont.truetype('/System/Library/Fonts/Arial Unicode.ttf', image_size, index=0)
-
-    images = [Image.new('RGB', (image_size, image_size), (255, 255, 255))]
-    for i, text in enumerate(input_string):
-
-        logger.debug('text', text)
-        text = text.strip()
-        if text in string.whitespace:
-            logger.debug('pass')
-            continue
-
-        # create image with white
-        img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
-        d = ImageDraw.Draw(img)
-
-        if text in string.ascii_letters:
-            w, h = d.textsize(text, font=font)
-            start_x = int((image_size - w) / 2)
-        else:
-            start_x = 0
-
-        logger.debug('start x', start_x)
-        # draw text in image
-        d.text((start_x, -20), text, fill='black', font=font)
-
-        # write image to file for debug
-        # s = io.BytesIO()
-        # img.save(s, 'png')
-        # in_memory_file = s.getvalue()
-        #
-        # with open(f'{i}.png', 'wb') as f:
-        #     f.write(in_memory_file)
-
-        images.append(img)
-    images.append(Image.new('RGB', (image_size, image_size), (255, 255, 255)))
-
-    output_img = [images[0]]
-    for i, image in enumerate(images[:-1]):
-
-        for f in range(1, frame):
-            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
-            w_crop_size_before = f * image_size // frame
-            w_crop_size_after = image_size - w_crop_size_before
-            img.paste(image.crop((w_crop_size_before, 0, image_size, image_size)), (0, 0))
-            img.paste(images[i + 1].crop((0, 0, w_crop_size_before, image_size)), (w_crop_size_after, 0))
-            output_img.append(img)
-
-        output_img.append(images[i + 1])
-
-    output_img.append(images[-1])
-
-    output_img[0].save(fp=f'{input_string}.gif', format='GIF', append_images=output_img[1:], save_all=True,
-                       duration=delay,
-                       loop=0)
-
-    logger.info(f'{input_string}.gif', 'generated')
+    text_to_gif(args.text, args.frame, args.delay, font, True)
