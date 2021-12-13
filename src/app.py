@@ -87,6 +87,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
         images[0].save(
             fp=output_name, format='GIF', append_images=images[1:], save_all=True,
             duration=delay,
+            optimize=True,
             loop=0)
 
         logger.info(output_name, 'generated')
