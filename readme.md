@@ -1,25 +1,14 @@
 # text to slack gif
 
-這是一個簡單的 Python 腳本，可以把文字轉成 slack 格式的 gif，免除你需要開好幾個線上服務一直轉換的問題。  
-做個出師表 gif 只是一瞬間！  
+這是一個簡單的 Python 腳本，可以把文字轉成 slack 格式的 gif，解決你需要開好幾個線上服務一直轉換的問題。  
+做出師表 gif 只需要一瞬間！  
 
-This is a simple python script that can automatically convert text into slack gif.
+This is a simple Python script that can convert text into gif in slack format, which solves the problem that you need to open several online services and keep converting.
 
+在我的 Mac 上測試 ok!  
 Test on MacBook ok!  
-![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%EF%BC%9A%E5%85%88%E5%B8%9D%E5%89%B5%E6%A5%AD%E6%9C%AA%E5%8D%8A%EF%BC%8C%E8%80%8C%E4%B8%AD%E9%81%93%E5%B4%A9%E6%AE%82%E3%80%82%E4%BB%8A%E5%A4%A9%E4%B8%8B%E4%B8%89%E5%88%86%EF%BC%8C%E7%9B%8A%E5%B7%9E%E7%96%B2%E5%BC%8A%EF%BC%8C%E6%AD%A4%E8%AA%A0%E5%8D%B1%E6%80%A5%E5%AD%98%E4%BA%A1%E4%B9%8B%E7%A7%8B%E4%B9%9F%E3%80%82.gif)
 
-## usage
-```
-usage: app.py [-h] [-t TEXT] [-f FRAME] [-d DELAY]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -t TEXT, --text TEXT  any text you want to convert to gif
-  -f FRAME, --frame FRAME
-                        frames number for each text between text
-  -d DELAY, --delay DELAY
-                        delay for each frame
-```
+## Basic usage
 
 Download app.zip from [Releases](https://github.com/PttCodingMan/text_to_slack_gif/releases).
 ```bash
@@ -29,7 +18,25 @@ or run python script.
 ```bash
 python3 app.py -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此誠危急存亡之秋也。"
 ```
-## build
+## Advanced usage
+However, you can get different type gif by adjusting frame and delay.  
+The default values for frame and delay are 5 and 100 respectively.
+```bash
+python3 app.py -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此 誠危急存亡之秋也。"
+```
+![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
+
+```bash
+python3 app.py -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此 誠危急存亡之秋也。" -f 1 -d 500
+```
+![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%201%20d%20500.gif)
+
+```bash
+python3 app.py -t "臣亮言：先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此 誠危急存亡之秋也。" -d 30
+```
+![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
+
+## Build
 ```bash
 sh make.sh
 ```
