@@ -103,8 +103,8 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
                         help="Frames number for each text between text")
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
-    parser.add_argument('-c', '--color', default=default_textColr, help="The text color; default: black; use HTML/CSS Color Name")
-    parser.add_argument('-w', '--width', type=check_positive, default=default_width, help="The width of window; default: 1")
+    parser.add_argument('-c', '--color', type=str, default=default_textColr, help="The text HTML/CSS Color Name; string, default: black")
+    parser.add_argument('-w', '--width', type=int, default=default_width, help="The width of image; integer; default: 1")
     args = parser.parse_args()
 
     if platform.system() == 'Darwin':
