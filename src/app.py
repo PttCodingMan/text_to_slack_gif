@@ -1,4 +1,3 @@
-import platform
 import string
 from argparse import ArgumentParser, ArgumentTypeError
 
@@ -20,10 +19,13 @@ def check_positive(value):
     return value
 
 
-def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
+def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool = False):
     while '  ' in text:
         text = text.replace('  ', ' ')
     input_string = text
+
+    if font is None:
+        font = '../font/Arial Unicode.ttf'
 
     logger.debug('text', input_string)
     logger.debug('frame', frame)
@@ -96,7 +98,6 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
 
 
 if __name__ == '__main__':
-
     parser = ArgumentParser()
     parser.add_argument('-t', '--text', help="Any text you want to convert to gif", required=True)
     parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
@@ -104,11 +105,4 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
     args = parser.parse_args()
 
-    if platform.system() == 'Darwin':
-        font = '/System/Library/Fonts/Arial Unicode.ttf'
-    elif platform.system() == 'Windows':
-        font = None
-    elif platform.system() == 'Linux':
-        font = None
-
-    text_to_gif(args.text, args.frame, args.delay, font, True)
+    text_to_gif(args.text, args.frame, args.delay, font=None, save=True)
