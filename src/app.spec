@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(['app.py'],
              pathex=[],
-             binaries=[],
+             binaries=[('../font/Arial Unicode.ttf', '.')],
              datas=[],
              hiddenimports=[],
              hookspath=[],
