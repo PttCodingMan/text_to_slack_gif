@@ -9,6 +9,8 @@ from SingleLog.log import Logger
 default_frame = 5
 default_delay = 100
 image_size = 100
+default_textColr = 'black'
+default_width = 1
 
 logger = Logger('app')
 
@@ -20,7 +22,7 @@ def check_positive(value):
     return value
 
 
-def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
+def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, textColor, width):
     while '  ' in text:
         text = text.replace('  ', ' ')
     input_string = text
@@ -57,7 +59,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
 
             logger.debug('start x', start_x)
             # draw text in image
-            d.text((start_x, -20), text, fill='black', font=font)
+            d.text((start_x, -20), text, fill=textColor, font=font)
 
             images.append(img)
     else:
@@ -70,10 +72,10 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool):
         x = (frame - 1) * frame_offset
         images = []
         while (text_total_width + x) >= frame_offset:
-            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+            img = Image.new('RGB', (image_size*width, image_size), (255, 255, 255))
             d = ImageDraw.Draw(img)
 
-            d.text((x, -20), input_string, fill='black', font=font)
+            d.text((x, -20), input_string, fill=textColor, font=font)
 
             images.append(img)
             x -= frame_offset
@@ -101,6 +103,8 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
                         help="Frames number for each text between text")
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
+    parser.add_argument('-c', '--color', type=str, default=default_textColr, help="The text HTML/CSS Color Name; string, default: black")
+    parser.add_argument('-w', '--width', type=int, default=default_width, help="The width of image; integer; default: 1")
     args = parser.parse_args()
 
     if platform.system() == 'Darwin':
@@ -110,4 +114,4 @@ if __name__ == '__main__':
     elif platform.system() == 'Linux':
         font = None
 
-    text_to_gif(args.text, args.frame, args.delay, font, True)
+    text_to_gif(args.text, args.frame, args.delay, font, True, args.color, args.width)
