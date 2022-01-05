@@ -7,7 +7,8 @@ from SingleLog.log import Logger
 # default value
 default_frame = 5
 default_delay = 100
-image_size = 100
+image_size = 50
+y_offset = -10
 
 logger = Logger('app')
 
@@ -17,6 +18,10 @@ def check_positive(value):
     if value <= 0:
         raise ArgumentTypeError("%s is an invalid positive int value" % value)
     return value
+
+
+def new_image():
+    return Image.new('RGB', (image_size, image_size), (255, 255, 255))
 
 
 def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool = False):
@@ -35,7 +40,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
     # load font
     font = ImageFont.truetype(font, image_size, index=0)
 
-    img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+    img = new_image()
     d = ImageDraw.Draw(img)
 
     if frame == 1:
@@ -48,7 +53,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
                 continue
 
             # create image with white
-            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+            img = new_image()
             d = ImageDraw.Draw(img)
 
             if text in string.ascii_letters:
@@ -59,7 +64,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
 
             logger.debug('start x', start_x)
             # draw text in image
-            d.text((start_x, -20), text, fill='black', font=font)
+            d.text((start_x, y_offset), text, fill='black', font=font)
 
             images.append(img)
     else:
@@ -72,10 +77,10 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
         x = (frame - 1) * frame_offset
         images = []
         while (text_total_width + x) >= frame_offset:
-            img = Image.new('RGB', (image_size, image_size), (255, 255, 255))
+            img = new_image()
             d = ImageDraw.Draw(img)
 
-            d.text((x, -20), input_string, fill='black', font=font)
+            d.text((x, y_offset), input_string, fill='black', font=font)
 
             images.append(img)
             x -= frame_offset
