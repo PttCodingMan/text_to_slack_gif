@@ -9,6 +9,8 @@ default_frame = 5
 default_delay = 100
 image_size = 50
 y_offset = -10
+default_color = 'black'
+default_width = 1
 
 logger = Logger('app')
 
@@ -20,11 +22,11 @@ def check_positive(value):
     return value
 
 
-def new_image():
-    return Image.new('RGB', (image_size, image_size), (255, 255, 255))
+def new_image(width):
+    return Image.new('RGB', (image_size * width, image_size), (255, 255, 255))
 
 
-def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool = False):
+def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int):
     while '  ' in text:
         text = text.replace('  ', ' ')
     input_string = text
@@ -40,7 +42,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
     # load font
     font = ImageFont.truetype(font, image_size, index=0)
 
-    img = new_image()
+    img = new_image(width)
     d = ImageDraw.Draw(img)
 
     if frame == 1:
@@ -53,7 +55,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
                 continue
 
             # create image with white
-            img = new_image()
+            img = new_image(width)
             d = ImageDraw.Draw(img)
 
             if text in string.ascii_letters:
@@ -64,8 +66,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
 
             logger.debug('start x', start_x)
             # draw text in image
-            d.text((start_x, y_offset), text, fill='black', font=font)
-
+            d.text((start_x, y_offset), text, fill=text_color, font=font)
             images.append(img)
     else:
         text_total_width, _ = d.textsize(input_string, font=font)
@@ -74,18 +75,18 @@ def text_to_gif(text: str, frame: int, delay: int, font: str = None, save: bool 
         frame_offset = single_full_text_length // frame
         logger.debug('frame_offset', frame_offset)
 
-        x = (frame - 1) * frame_offset
+        x = (frame - 1) * frame_offset * width
         images = []
         while (text_total_width + x) >= frame_offset:
-            img = new_image()
+            img = new_image(width)
             d = ImageDraw.Draw(img)
 
-            d.text((x, y_offset), input_string, fill='black', font=font)
+            d.text((x, y_offset), input_string, fill=text_color, font=font)
 
             images.append(img)
             x -= frame_offset
 
-        for _ in range(frame - 1):
+        for _ in range((frame - 1) * width):
             images.append(images.pop(0))
 
     if save:
@@ -108,6 +109,10 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
                         help="Frames number for each text between text")
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
+    parser.add_argument('-c', '--color', type=str, default=default_color,
+                        help="The text HTML/CSS Color Name; string, default: black")
+    parser.add_argument('-w', '--width', type=int, default=default_width,
+                        help="The width of image; integer; default: 1")
     args = parser.parse_args()
 
-    text_to_gif(args.text, args.frame, args.delay, font=None, save=True)
+    text_to_gif(args.text, args.frame, args.delay, None, True, args.color, args.width)
