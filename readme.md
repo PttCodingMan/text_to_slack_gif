@@ -3,8 +3,9 @@
 這是一個簡單的 Python 腳本，可以把文字轉成 slack 格式的 gif，解決你需要開好幾個線上服務一直轉換的問題。  
 做出師表 gif 只需要一瞬間！  
 
-This is a simple Python script that can convert text to gif in slack format, 
-which solves the problem that you need to use several online services to do this.
+This is a simple Python script that can convert text to gif in slack format.  
+This script solves the problem that you need to use several online services to do this.  
+And the more important thing is it saves your time!
 
 在我的 Mac 上測試 ok!  
 Test on my MacBook ok!  
