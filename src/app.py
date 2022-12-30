@@ -2,7 +2,7 @@ import string
 from argparse import ArgumentParser, ArgumentTypeError
 
 from PIL import ImageFont, Image, ImageDraw
-from SingleLog.log import Logger
+from SingleLog import Logger
 
 # default value
 default_frame = 5
