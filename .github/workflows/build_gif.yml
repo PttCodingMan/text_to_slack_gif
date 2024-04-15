@@ -17,10 +17,6 @@ on:
         required: true
         default: '100'
 
-permissions:
-  contents: read
-  actions: write
-  
 jobs:
   build-gif:
     runs-on: ubuntu-latest
