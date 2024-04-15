@@ -1,3 +1,4 @@
+import os
 import string
 from argparse import ArgumentParser, ArgumentTypeError
 
@@ -13,6 +14,8 @@ default_color = 'black'
 default_width = 1
 
 logger = Logger('app')
+
+_script_path = os.path.dirname(os.path.abspath(__file__))
 
 
 def check_positive(value):
@@ -32,7 +35,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
     input_string = text
 
     if font is None:
-        font = '../font/Arial Unicode.ttf'
+        font = f'{_script_path}/../font/Arial Unicode.ttf'
 
     logger.debug('text', input_string)
     logger.debug('frame', frame)
