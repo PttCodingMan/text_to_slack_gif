@@ -69,7 +69,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
             d.text((start_x, y_offset), text, fill=text_color, font=font)
             images.append(img)
     else:
-        text_total_width, _ = d.textsize(input_string, font=font)
+        text_total_width = d.textlength(input_string, font=font)
         logger.debug('text_total_width', text_total_width)
 
         frame_offset = single_full_text_length // frame
@@ -90,8 +90,8 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
             images.append(images.pop(0))
 
     if save:
-        output_name = f'{input_string[:5].strip()} in f {frame} d {delay}.gif'
-
+        # output_name = f'{input_string[:5].strip()} in f {frame} d {delay}.gif'
+        output_name = "output.gif"
         images[0].save(
             fp=output_name, format='GIF', append_images=images[1:], save_all=True,
             duration=delay,

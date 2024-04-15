@@ -1,0 +1,45 @@
+
+name: build gif
+
+on:
+  workflow_dispatch:
+    inputs:
+      gif_text:
+        description: 'Gif to build'
+        required: true
+        default: '臣亮言：先帝創業未半，而中道崩殂；今天下三分，益州疲敝，此誠危急存亡之秋也。'
+      gif_frame:
+        description: 'Gif frame'
+        required: true
+        default: '5'
+      gif_delay:
+        description: 'Gif delay'
+        required: true
+        default: '100'
+
+jobs:
+  build-gif:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build gif
+        run: |
+          python src/app.py -t "${{ github.event.inputs.gif_text }}" -f ${{ github.event.inputs.gif_frame }} -d ${{ github.event.inputs.gif_delay }}
+
+      - name: Upload gif
+        uses: actions/upload-artifact@v4
+        with:
+          name: gif
+          path: output.gif
