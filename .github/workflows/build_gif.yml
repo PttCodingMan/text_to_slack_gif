@@ -2,7 +2,7 @@
 name: build gif
 
 on:
-  public:
+  repository_dispatch:
   workflow_dispatch:
     inputs:
       gif_text:
