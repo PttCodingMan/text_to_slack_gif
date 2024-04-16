@@ -62,7 +62,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
             d = ImageDraw.Draw(img)
 
             if text in string.ascii_letters:
-                w, h = d.textsize(text, font=font)
+                w = d.textlength(input_string, font=font)
                 start_x = int((image_size - w) / 2)
             else:
                 start_x = 0

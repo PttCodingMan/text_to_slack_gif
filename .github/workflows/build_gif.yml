@@ -1,6 +1,9 @@
 
 name: build gif
 
+permissions:
+  actions: read
+
 on:
   workflow_dispatch:
     inputs:
@@ -42,4 +45,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gif
-          path: output.gif
+          path: ${{ github.event.inputs.gif_text }}.gif
