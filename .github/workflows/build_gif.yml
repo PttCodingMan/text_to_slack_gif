@@ -3,6 +3,7 @@ name: build gif
 
 on:
   repository_dispatch:
+    types: [test_result]
   workflow_dispatch:
     inputs:
       gif_text:
