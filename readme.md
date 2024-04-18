@@ -22,16 +22,14 @@ And the more important thing is it saves your time!
 3. Run the script.
 
 ```bash
-./app -t "臣亮言..."
-```
-or run python script.
-```bash
-python3 app.py -t "臣亮言..."
+python3 src/app.py -t "臣亮言..."
 ```
 
 ## Advanced usage
+
 However, you can get different type gif by adjusting frame and delay.  
 The default values for frame and delay are 5 and 100 respectively.
+
 ```bash
 python3 app.py -t "臣亮言..."
 ```
