@@ -30,9 +30,7 @@ def new_image(width):
 
 
 def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int):
-    while '  ' in text:
-        text = text.replace('  ', ' ')
-    input_string = text
+    input_string = ' '.join(text.split())
 
     if font is None:
         font = f'{_script_path}/../font/Arial Unicode.ttf'

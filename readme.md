@@ -7,12 +7,23 @@ This is a simple Python script that can convert text to gif in slack format.
 This script solves the problem that you need to use several online services to do this.  
 And the more important thing is it saves your time!
 
-在我的 Mac 上測試 ok!  
-Test on my MacBook ok!  
-
 ## Basic usage
 
-Download app.zip from [Releases](https://github.com/PttCodingMan/text_to_slack_gif/releases).
+### Run on Github Actions
+
+1. Fork this repository.
+2. Go to the Actions tab and enable workflows.
+3. Select `build gif` workflow.
+4. Click `Run workflow` button.
+5. Input the text you want to convert.
+6. Download the gif.
+
+### Run on your local machine
+
+1. Clone this repository.
+2. Install the required packages.
+3. Run the script.
+
 ```bash
 ./app -t "臣亮言..."
 ```
@@ -20,6 +31,7 @@ or run python script.
 ```bash
 python3 app.py -t "臣亮言..."
 ```
+
 ## Advanced usage
 However, you can get different type gif by adjusting frame and delay.  
 The default values for frame and delay are 5 and 100 respectively.
@@ -56,7 +68,3 @@ python3 app.py -c blueviolet -w 5 -t "臣亮言..."
 ```
 ![image](https://github.com/PersonalComputerRetailer/text_to_slack_gif/blob/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%EF%BC%9A%E5%85%88%20in%20f%205%20d%20100_violet_w5.gif)
 
-## Build
-```bash
-sh make.sh
-```
