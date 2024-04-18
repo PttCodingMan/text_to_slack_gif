@@ -41,5 +41,5 @@ jobs:
       - name: Upload gif
         uses: actions/upload-artifact@v4
         with:
-          name: YOUR_GIF_IS_READY
+          name: YOUR_GIF_IS_HERE
           path: output.gif
