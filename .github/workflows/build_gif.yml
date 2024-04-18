@@ -41,5 +41,5 @@ jobs:
       - name: Upload gif
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.inputs.gif_text }}
+          name: YOUR_GIF_IS_READY
           path: output.gif
