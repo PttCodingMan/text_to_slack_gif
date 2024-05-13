@@ -33,17 +33,17 @@ The default values for frame and delay are 5 and 100 respectively.
 ```bash
 python3 src/app.py -t "臣亮言..."
 ```
-![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
+![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
 
 ```bash
 python3 src/app.py -f 1 -d 500 -t "臣亮言..."
 ```
-![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%201%20d%20500.gif)
+![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%201%20d%20500.gif)
 
 ```bash
 python3 src/app.py -d 30 -t "臣亮言..."
 ```
-![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
+![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
 
 ## Font color
 
