@@ -45,9 +45,20 @@ python3 src/app.py -d 30 -t "臣亮言..."
 ```
 ![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
 
+## Theme
+
+Add `--theme <dark/light>` argument to change the theme of the gif. Default is `dark`.
+
+- `dark`: Black background with white text.
+- `light`: White background with black text.
+
+```bash
+python3 src/app.py --theme light -t "臣亮言..."
+```
+
 ## Font color
 
-Add `-c <HTML/CSS Color Name>` or `--color=<HTML/CSS Color Name>` argument to change font color; type=str. Default is black. 
+Add `-c <HTML/CSS Color Name>` or `--color=<HTML/CSS Color Name>` argument to change font color; type=str. This will override the default color of the selected theme.
 
 ```bash
 python3 src/app.py -c blueviolet -t "臣亮言..."

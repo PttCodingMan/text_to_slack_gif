@@ -25,11 +25,11 @@ def check_positive(value):
     return value
 
 
-def new_image(width):
-    return Image.new('RGB', (image_size * width, image_size), (255, 255, 255))
+def new_image(width, background_color):
+    return Image.new('RGB', (image_size * width, image_size), background_color)
 
 
-def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int):
+def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int, background_color: str):
     input_string = ' '.join(text.split())
 
     if font is None:
@@ -43,7 +43,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
     # load font
     font = ImageFont.truetype(font, image_size, index=0)
 
-    img = new_image(width)
+    img = new_image(width, background_color)
     d = ImageDraw.Draw(img)
 
     if frame == 1:
@@ -56,7 +56,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
                 continue
 
             # create image with white
-            img = new_image(width)
+            img = new_image(width, background_color)
             d = ImageDraw.Draw(img)
 
             if text in string.ascii_letters:
@@ -79,7 +79,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
         x = (frame - 1) * frame_offset * width
         images = []
         while (text_total_width + x) >= frame_offset:
-            img = new_image(width)
+            img = new_image(width, background_color)
             d = ImageDraw.Draw(img)
 
             d.text((x, y_offset), input_string, fill=text_color, font=font)
@@ -110,10 +110,22 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
                         help="Frames number for each text between text")
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
-    parser.add_argument('-c', '--color', type=str, default=default_color,
+    parser.add_argument('-c', '--color', type=str, default=None,
                         help="The text HTML/CSS Color Name; string, default: black")
     parser.add_argument('-w', '--width', type=int, default=default_width,
                         help="The width of image; integer; default: 1")
+    parser.add_argument('--theme', type=str, default='dark', choices=['dark', 'light'],
+                        help="The theme of the gif; string, default: dark")
     args = parser.parse_args()
 
-    text_to_gif(args.text, args.frame, args.delay, None, True, args.color, args.width)
+    if args.theme == 'dark':
+        background_color = 'black'
+        text_color = 'white'
+    else:
+        background_color = 'white'
+        text_color = 'black'
+
+    if args.color:
+        text_color = args.color
+
+    text_to_gif(args.text, args.frame, args.delay, None, True, text_color, args.width, background_color)
