@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>text to slack gif</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #161f36;
+    --muted: #272f42;
+    --border: #2f3b52;
+    --fg: #f8fafc;
+    --fg-dim: #94a3b8;
+    --accent: #22c55e;
+    --danger: #ef4444;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 3rem 1rem 4rem;
+    background: var(--bg);
+    color: var(--fg);
+    font: 400 15px/1.6 Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 44rem; margin: 0 auto; }
+
+  header { margin-bottom: 2rem; display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between; }
+  h1 { margin: 0; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; }
+  header p { margin: .35rem 0 0; color: var(--fg-dim); font-size: .9rem; }
+
+  .lang { display: flex; flex: none; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .lang button {
+    min-width: 44px; min-height: 36px; padding: 0 .6rem;
+    background: var(--muted); color: var(--fg-dim);
+    border: 0; font: 500 .85rem/1 Inter, system-ui, sans-serif; cursor: pointer;
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+  .lang button:hover { color: var(--fg); }
+  .lang button[aria-pressed="true"] { background: var(--accent); color: #052e16; }
+  .lang button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+  }
+  .card + .card { margin-top: 1rem; }
+
+  .field { display: grid; gap: .4rem; }
+  .field > span { font-size: .8rem; font-weight: 500; color: var(--fg-dim); letter-spacing: .02em; }
+  .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); margin-top: 1rem; }
+  /* labels wrap to different heights; pin the inputs to the bottom so the row stays aligned */
+  .grid > .field { align-content: end; }
+
+  input, select {
+    width: 100%;
+    min-height: 40px;
+    padding: .45rem .6rem;
+    background: var(--muted);
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    transition: border-color 150ms ease;
+  }
+  input:hover, select:hover { border-color: #43536e; }
+  input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  input::placeholder { color: #64748b; }
+  select {
+    appearance: none; cursor: pointer; padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right .6rem center; background-size: 16px;
+  }
+
+  .preview-card { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+  .stage {
+    padding: 1rem;
+    border-radius: 8px;
+    background:
+      repeating-conic-gradient(#20293d 0 25%, #1a2235 0 50%) 0 0 / 16px 16px;
+    display: grid;
+    place-items: center;
+    min-height: 132px;
+    min-width: 132px;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  /* 2× so a 50px emoji is actually readable; wide tiles scroll inside the stage */
+  #preview { image-rendering: pixelated; display: block; height: 100px; width: auto; }
+  .meta { flex: 1 1 12rem; display: grid; gap: .5rem; align-content: center; }
+  .meta dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .15rem .75rem; font-size: .85rem; }
+  .meta dt { color: var(--fg-dim); }
+  .meta dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .meta dd.over { color: var(--danger); }
+
+  a.button {
+    display: inline-flex; align-items: center; gap: .5rem;
+    min-height: 44px; padding: 0 1.1rem;
+    background: var(--accent); color: #052e16;
+    border-radius: 8px; font-weight: 600; text-decoration: none;
+    justify-self: start;
+    transition: filter 150ms ease;
+  }
+  a.button:hover { filter: brightness(1.12); }
+  a.button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  a.button svg { width: 18px; height: 18px; }
+
+  footer { margin-top: 2rem; color: var(--fg-dim); font-size: .8rem; }
+  footer a { color: var(--fg-dim); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<main>
+  <header>
+    <div>
+      <h1>text to slack gif</h1>
+      <p data-i18n="subtitle"></p>
+    </div>
+    <div class="lang" id="lang">
+      <button type="button" value="zh" aria-pressed="false">中</button>
+      <button type="button" value="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <label class="field"><span data-i18n="text"></span>
+      <input type="text" id="text" value="臣亮言 先帝創業未半 而中道崩殂">
+    </label>
+    <div class="grid">
+      <label class="field"><span data-i18n="frame"></span><input type="number" id="frame" value="5" min="1"></label>
+      <label class="field"><span data-i18n="delay"></span><input type="number" id="delay" value="100" min="1"></label>
+      <label class="field"><span data-i18n="width"></span><input type="number" id="width" value="1" min="1"></label>
+      <label class="field"><span data-i18n="theme"></span>
+        <select id="theme"><option value="dark">dark</option><option value="light">light</option></select>
+      </label>
+      <label class="field"><span data-i18n="color"></span><input type="text" id="color" data-i18n-ph="colorPh"></label>
+    </div>
+  </section>
+
+  <section class="card preview-card">
+    <div class="stage"><img id="preview" data-i18n-alt="previewAlt" alt=""></div>
+    <div class="meta">
+      <dl>
+        <dt data-i18n="dim"></dt><dd id="dim">–</dd>
+        <dt data-i18n="count"></dt><dd id="count">–</dd>
+        <dt data-i18n="size"></dt><dd id="size">–</dd>
+      </dl>
+      <a class="button" id="download" download="output.gif">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="download"></span>
+      </a>
+    </div>
+  </section>
+
+  <footer data-i18n="footer"></footer>
+</main>
+
+<script type="module">
+import { GIFEncoder, quantize, applyPalette } from 'https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js';
+
+const STRINGS = {
+  zh: {
+    subtitle: '把文字轉成 50×50 的捲動 GIF，直接當 Slack 自訂 emoji。全部在瀏覽器裡跑。',
+    text: '文字', frame: 'Frame（1 = 逐字）', delay: 'Delay (ms)', width: '寬度 (×50px)',
+    theme: '主題', color: '文字顏色', colorPh: '依主題',
+    dim: '尺寸', count: '張數', size: '檔案',
+    download: '下載 output.gif', previewAlt: 'GIF 預覽',
+    footer: 'Slack 自訂 emoji 上限 128 KB。字體用瀏覽器內建的，跟 CLI 版可能略有差異。',
+  },
+  en: {
+    subtitle: 'Turn text into a 50×50 scrolling GIF for Slack custom emoji. Runs entirely in your browser.',
+    text: 'Text', frame: 'Frame (1 = per char)', delay: 'Delay (ms)', width: 'Width (×50px)',
+    theme: 'Theme', color: 'Text color', colorPh: 'theme default',
+    dim: 'Size', count: 'Frames', size: 'File',
+    download: 'Download output.gif', previewAlt: 'GIF preview',
+    footer: 'Slack caps custom emoji at 128 KB. Fonts come from your browser, so results may differ slightly from the CLI.',
+  },
+};
+
+function setLang(code) {
+  const t = STRINGS[code];
+  document.documentElement.lang = code === 'zh' ? 'zh-Hant' : 'en';
+  localStorage.setItem('lang', code);
+  for (const el of document.querySelectorAll('[data-i18n]')) el.textContent = t[el.dataset.i18n];
+  for (const el of document.querySelectorAll('[data-i18n-ph]')) el.placeholder = t[el.dataset.i18nPh];
+  for (const el of document.querySelectorAll('[data-i18n-alt]')) el.alt = t[el.dataset.i18nAlt];
+  for (const b of lang.children) b.setAttribute('aria-pressed', b.value === code);
+}
+lang.addEventListener('click', e => { if (e.target.value) setLang(e.target.value); });
+setLang(localStorage.getItem('lang') || (navigator.language.startsWith('zh') ? 'zh' : 'en'));
+
+const IMAGE_SIZE = 50;
+const SLACK_LIMIT = 128 * 1024;
+// ponytail: browser font metrics differ from Pillow's, so this is a calibration knob, not a port of y_offset=-10
+const BASELINE = 42;
+const FONT = `${IMAGE_SIZE}px "Arial Unicode MS", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif`;
+
+// Returns a list of canvases, one per GIF frame. Mirrors text_to_gif() in src/app.py.
+function renderFrames({ text, frame, width, bg, fg }) {
+  const s = text.split(/\s+/).filter(Boolean).join(' ');
+  const make = () => {
+    const c = document.createElement('canvas');
+    c.width = IMAGE_SIZE * width;
+    c.height = IMAGE_SIZE;
+    const d = c.getContext('2d', { willReadFrequently: true });
+    d.fillStyle = bg;
+    d.fillRect(0, 0, c.width, c.height);
+    d.font = FONT;
+    d.fillStyle = fg;
+    return [c, d];
+  };
+  const frames = [];
+
+  if (frame === 1) {
+    for (const ch of s) {
+      if (!ch.trim()) continue;
+      const [c, d] = make();
+      // ASCII gets centred in its 50px tile; CJK is already full-width
+      const x = /[A-Za-z]/.test(ch) ? (IMAGE_SIZE - d.measureText(ch).width) / 2 : 0;
+      d.fillText(ch, x, BASELINE);
+      frames.push(c);
+    }
+  } else {
+    const [, probe] = make();
+    const total = probe.measureText(s).width;
+    const step = Math.floor(IMAGE_SIZE / frame);
+    let x = (frame - 1) * step * width;
+    while (total + x >= step) {
+      const [c, d] = make();
+      d.fillText(s, x, BASELINE);
+      frames.push(c);
+      x -= step;
+    }
+    // start the loop with text already on screen instead of a blank tile
+    for (let i = 0; i < (frame - 1) * width; i++) frames.push(frames.shift());
+  }
+  return frames;
+}
+
+function encodeGif(frames, delay) {
+  const gif = GIFEncoder();
+  const { width, height } = frames[0];
+  let palette;
+  for (const c of frames) {
+    const data = c.getContext('2d').getImageData(0, 0, width, height).data;
+    // ponytail: 32 colours is plenty for anti-aliased 2-tone text and keeps us under Slack's 128 KB
+    if (!palette) palette = quantize(data, 32);
+    gif.writeFrame(applyPalette(data, palette), width, height, { palette, delay, repeat: 0 });
+  }
+  gif.finish();
+  return new Blob([gif.bytes()], { type: 'image/gif' });
+}
+
+let url;
+function update() {
+  const dark = theme.value === 'dark';
+  const frames = renderFrames({
+    text: text.value,
+    frame: Math.max(1, +frame.value || 1),
+    width: Math.max(1, +width.value || 1),
+    bg: dark ? 'black' : 'white',
+    fg: color.value.trim() || (dark ? 'white' : 'black'),
+  });
+  if (!frames.length) return;
+  const blob = encodeGif(frames, Math.max(1, +delay.value || 100));
+  if (url) URL.revokeObjectURL(url);
+  url = URL.createObjectURL(blob);
+  preview.src = url;
+  download.href = url;
+  dim.textContent = `${frames[0].width} × ${frames[0].height}`;
+  count.textContent = frames.length;
+  size.textContent = `${(blob.size / 1024).toFixed(1)} KB`;
+  size.classList.toggle('over', blob.size > SLACK_LIMIT);
+}
+
+for (const el of [text, frame, delay, width, theme, color]) el.addEventListener('input', update);
+update();
+
+// ponytail: one check — frame counts must match src/app.py's marquee math
+const n = renderFrames({ text: 'abc', frame: 5, width: 1, bg: '#000', fg: '#fff' }).length;
+console.assert(n > 5, `marquee produced ${n} frames`);
+</script>
