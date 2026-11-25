@@ -150,6 +150,13 @@
       <label class="field"><span data-i18n="theme"></span>
         <select id="theme"><option value="dark">dark</option><option value="light">light</option></select>
       </label>
+      <label class="field"><span data-i18n="flash"></span>
+        <select id="flash">
+          <option value="none" data-i18n="flashNone"></option>
+          <option value="blink" data-i18n="flashBlink"></option>
+          <option value="rainbow" data-i18n="flashRainbow"></option>
+        </select>
+      </label>
       <label class="field"><span data-i18n="color"></span><input type="text" id="color" data-i18n-ph="colorPh"></label>
     </div>
   </section>
@@ -186,6 +193,7 @@ const STRINGS = {
     subtitle: '把文字轉成 50×50 的捲動 GIF，直接當 Slack 自訂 emoji。全部在瀏覽器裡跑。',
     text: '文字', frame: 'Frame（1 = 逐字）', delay: 'Delay (ms)', width: '寬度 (×50px)',
     theme: '主題', color: '文字顏色', colorPh: '依主題',
+    flash: '閃字', flashNone: '不閃', flashBlink: '一閃一閃', flashRainbow: '彩虹變色',
     dim: '尺寸', count: '張數', size: '檔案',
     download: '下載 output.gif', previewAlt: 'GIF 預覽',
     footer: 'Slack 自訂 emoji 上限 128 KB。字體用瀏覽器內建的，跟 CLI 版可能略有差異。',
@@ -194,6 +202,7 @@ const STRINGS = {
     subtitle: 'Turn text into a 50×50 scrolling GIF for Slack custom emoji. Runs entirely in your browser.',
     text: 'Text', frame: 'Frame (1 = per char)', delay: 'Delay (ms)', width: 'Width (×50px)',
     theme: 'Theme', color: 'Text color', colorPh: 'theme default',
+    flash: 'Flash', flashNone: 'None', flashBlink: 'Blink', flashRainbow: 'Rainbow',
     dim: 'Size', count: 'Frames', size: 'File',
     download: 'Download output.gif', previewAlt: 'GIF preview',
     footer: 'Slack caps custom emoji at 128 KB. Fonts come from your browser, so results may differ slightly from the CLI.',
@@ -216,10 +225,12 @@ const IMAGE_SIZE = 50;
 const SLACK_LIMIT = 128 * 1024;
 // ponytail: browser font metrics differ from Pillow's, so this is a calibration knob, not a port of y_offset=-10
 const BASELINE = 42;
+// same colors as rainbow_colors in src/app.py
+const RAINBOW = ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#00c7be', '#007aff', '#af52de'];
 const FONT = `${IMAGE_SIZE}px "Arial Unicode MS", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif`;
 
 // Returns a list of canvases, one per GIF frame. Mirrors text_to_gif() in src/app.py.
-function renderFrames({ text, frame, width, bg, fg }) {
+function renderFrames({ text, frame, width, bg, fg, flash = 'none' }) {
   const s = text.split(/\s+/).filter(Boolean).join(' ');
   const make = () => {
     const c = document.createElement('canvas');
@@ -229,45 +240,58 @@ function renderFrames({ text, frame, width, bg, fg }) {
     d.fillStyle = bg;
     d.fillRect(0, 0, c.width, c.height);
     d.font = FONT;
-    d.fillStyle = fg;
     return [c, d];
   };
-  const frames = [];
+  const [, probe] = make();
+  // each entry is [x, text] drawn on one frame
+  let draws = [];
 
   if (frame === 1) {
     for (const ch of s) {
       if (!ch.trim()) continue;
-      const [c, d] = make();
       // ASCII gets centred in its 50px tile; CJK is already full-width
-      const x = /[A-Za-z]/.test(ch) ? (IMAGE_SIZE - d.measureText(ch).width) / 2 : 0;
-      d.fillText(ch, x, BASELINE);
-      frames.push(c);
+      const x = /[A-Za-z]/.test(ch) ? (IMAGE_SIZE - probe.measureText(ch).width) / 2 : 0;
+      draws.push([x, ch]);
     }
   } else {
-    const [, probe] = make();
     const total = probe.measureText(s).width;
     const step = Math.floor(IMAGE_SIZE / frame);
     let x = (frame - 1) * step * width;
     while (total + x >= step) {
-      const [c, d] = make();
-      d.fillText(s, x, BASELINE);
-      frames.push(c);
+      draws.push([x, s]);
       x -= step;
     }
     // start the loop with text already on screen instead of a blank tile
-    for (let i = 0; i < (frame - 1) * width; i++) frames.push(frames.shift());
+    for (let i = 0; i < (frame - 1) * width; i++) draws.push(draws.shift());
   }
+  if (!draws.length) return [];
+
+  // a short animation needs enough frames to go through every color
+  if (flash === 'rainbow' && draws.length < RAINBOW.length) {
+    draws = Array(Math.ceil(RAINBOW.length / draws.length)).fill(draws).flat();
+  }
+
+  const frames = [];
+  draws.forEach(([x, t], i) => {
+    const [c, d] = make();
+    d.fillStyle = flash === 'rainbow' ? RAINBOW[i % RAINBOW.length] : fg;
+    d.fillText(t, x, BASELINE);
+    frames.push(c);
+    // every frame is followed by an empty one, so the text blinks
+    if (flash === 'blink') frames.push(make()[0]);
+  });
   return frames;
 }
 
-function encodeGif(frames, delay) {
+function encodeGif(frames, delay, perFramePalette = false) {
   const gif = GIFEncoder();
   const { width, height } = frames[0];
   let palette;
   for (const c of frames) {
     const data = c.getContext('2d').getImageData(0, 0, width, height).data;
-    // ponytail: 32 colours is plenty for anti-aliased 2-tone text and keeps us under Slack's 128 KB
-    if (!palette) palette = quantize(data, 32);
+    // ponytail: 32 colours is plenty for anti-aliased 2-tone text and keeps us under Slack's 128 KB.
+    // Rainbow frames each have a different text colour, so they get their own palette.
+    if (!palette || perFramePalette) palette = quantize(data, 32);
     gif.writeFrame(applyPalette(data, palette), width, height, { palette, delay, repeat: 0 });
   }
   gif.finish();
@@ -283,9 +307,10 @@ function update() {
     width: Math.max(1, +width.value || 1),
     bg: dark ? 'black' : 'white',
     fg: color.value.trim() || (dark ? 'white' : 'black'),
+    flash: flash.value,
   });
   if (!frames.length) return;
-  const blob = encodeGif(frames, Math.max(1, +delay.value || 100));
+  const blob = encodeGif(frames, Math.max(1, +delay.value || 100), flash.value === 'rainbow');
   if (url) URL.revokeObjectURL(url);
   url = URL.createObjectURL(blob);
   preview.src = url;
@@ -296,7 +321,7 @@ function update() {
   size.classList.toggle('over', blob.size > SLACK_LIMIT);
 }
 
-for (const el of [text, frame, delay, width, theme, color]) el.addEventListener('input', update);
+for (const el of [text, frame, delay, width, theme, flash, color]) el.addEventListener('input', update);
 update();
 
 // ponytail: one check — frame counts must match src/app.py's marquee math

@@ -16,6 +16,15 @@ on:
         options:
           - 'dark - 黑底白字'
           - 'light - 白底黑字'
+      gif_flash:
+        description: '閃字效果 (Flashing effect)'
+        required: true
+        type: choice
+        default: 'none - 不閃'
+        options:
+          - 'none - 不閃'
+          - 'blink - 一閃一閃（文字和空白交替）'
+          - 'rainbow - 彩虹變色（會忽略文字顏色）'
       gif_color:
         description: '文字顏色，留空則依主題 (Text color, HTML/CSS name or #hex, e.g. red / #ff8800; blank = theme default)'
         required: false
@@ -64,6 +73,7 @@ jobs:
         env:
           GIF_TEXT: ${{ inputs.gif_text }}
           GIF_THEME: ${{ inputs.gif_theme }}
+          GIF_FLASH: ${{ inputs.gif_flash }}
           GIF_COLOR: ${{ inputs.gif_color }}
           GIF_FRAME: ${{ inputs.gif_frame }}
           GIF_DELAY: ${{ inputs.gif_delay }}
@@ -74,8 +84,9 @@ jobs:
 
           # Option labels look like "dark - 黑底白字"; keep only the first word.
           theme="${GIF_THEME%% *}"
+          flash="${GIF_FLASH%% *}"
 
-          args=(-t "$GIF_TEXT" -f "$GIF_FRAME" -d "$GIF_DELAY" -w "$GIF_WIDTH" --theme "$theme")
+          args=(-t "$GIF_TEXT" -f "$GIF_FRAME" -d "$GIF_DELAY" -w "$GIF_WIDTH" --theme "$theme" --flash "$flash")
           color="$(trim "$GIF_COLOR")"
           if [ -n "$color" ]; then
             args+=(-c "$color")
@@ -99,6 +110,7 @@ jobs:
             echo "| --- | --- |"
             echo "| Text | $GIF_TEXT |"
             echo "| Theme | $theme |"
+            echo "| Flash | $flash |"
             echo "| Text color | ${color:-(theme default)} |"
             echo "| Frames per character | $GIF_FRAME |"
             echo "| Delay (ms) | $GIF_DELAY |"

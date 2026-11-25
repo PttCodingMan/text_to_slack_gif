@@ -12,6 +12,8 @@ image_size = 50
 y_offset = -10
 default_color = 'black'
 default_width = 1
+flash_modes = ['none', 'blink', 'rainbow']
+rainbow_colors = ['#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#00c7be', '#007aff', '#af52de']
 
 logger = Logger('app')
 
@@ -29,7 +31,8 @@ def new_image(width, background_color):
     return Image.new('RGB', (image_size * width, image_size), background_color)
 
 
-def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int, background_color: str):
+def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int,
+                background_color: str, flash: str = 'none'):
     input_string = ' '.join(text.split())
 
     if font is None:
@@ -38,37 +41,28 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
     logger.debug('text', input_string)
     logger.debug('frame', frame)
     logger.debug('delay', delay)
+    logger.debug('flash', flash)
 
     single_full_text_length = image_size
     # load font
     font = ImageFont.truetype(font, image_size, index=0)
 
-    img = new_image(width, background_color)
-    d = ImageDraw.Draw(img)
+    d = ImageDraw.Draw(new_image(width, background_color))
 
+    # each entry is (x, text) drawn on one frame
+    draws = []
     if frame == 1:
-        images = []
-        for i, text in enumerate(input_string):
-
-            logger.debug('text', text)
-            if text in string.whitespace:
-                logger.debug('pass')
+        for char in input_string:
+            if char in string.whitespace:
                 continue
 
-            # create image with white
-            img = new_image(width, background_color)
-            d = ImageDraw.Draw(img)
-
-            if text in string.ascii_letters:
-                w = d.textlength(input_string, font=font)
+            if char in string.ascii_letters:
+                w = d.textlength(char, font=font)
                 start_x = int((image_size - w) / 2)
             else:
                 start_x = 0
 
-            logger.debug('start x', start_x)
-            # draw text in image
-            d.text((start_x, y_offset), text, fill=text_color, font=font)
-            images.append(img)
+            draws.append((start_x, char))
     else:
         text_total_width = d.textlength(input_string, font=font)
         logger.debug('text_total_width', text_total_width)
@@ -77,18 +71,32 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
         logger.debug('frame_offset', frame_offset)
 
         x = (frame - 1) * frame_offset * width
-        images = []
         while (text_total_width + x) >= frame_offset:
-            img = new_image(width, background_color)
-            d = ImageDraw.Draw(img)
-
-            d.text((x, y_offset), input_string, fill=text_color, font=font)
-
-            images.append(img)
+            draws.append((x, input_string))
             x -= frame_offset
 
+        # start the loop with text already on screen instead of a blank tile
         for _ in range((frame - 1) * width):
-            images.append(images.pop(0))
+            draws.append(draws.pop(0))
+
+    if not draws:
+        raise ValueError('text is empty')
+
+    if flash == 'rainbow' and len(draws) < len(rainbow_colors):
+        # a short animation needs enough frames to go through every color
+        draws = draws * -(-len(rainbow_colors) // len(draws))
+
+    images = []
+    for i, (x, t) in enumerate(draws):
+        color = rainbow_colors[i % len(rainbow_colors)] if flash == 'rainbow' else text_color
+
+        img = new_image(width, background_color)
+        ImageDraw.Draw(img).text((x, y_offset), t, fill=color, font=font)
+        images.append(img)
+
+        if flash == 'blink':
+            # every frame is followed by an empty one, so the text blinks
+            images.append(new_image(width, background_color))
 
     if save:
         # output_name = f'{input_string[:5].strip()} in f {frame} d {delay}.gif'
@@ -116,6 +124,9 @@ if __name__ == '__main__':
                         help="The width of image; integer; default: 1")
     parser.add_argument('--theme', type=str, default='dark', choices=['dark', 'light'],
                         help="The theme of the gif; string, default: dark")
+    parser.add_argument('--flash', type=str, default='none', choices=flash_modes,
+                        help="Flashing effect: none, blink (text and blank frames alternate), "
+                             "rainbow (text cycles through colors, overrides --color); default: none")
     args = parser.parse_args()
 
     if args.theme == 'dark':
@@ -128,4 +139,4 @@ if __name__ == '__main__':
     if args.color:
         text_color = args.color
 
-    text_to_gif(args.text, args.frame, args.delay, None, True, text_color, args.width, background_color)
+    text_to_gif(args.text, args.frame, args.delay, None, True, text_color, args.width, background_color, args.flash)
