@@ -17,14 +17,14 @@ on:
           - 'dark - 黑底白字'
           - 'light - 白底黑字'
       gif_flash:
-        description: '閃字效果 (Flashing effect)'
+        description: '閃背景效果 (Flashing background)'
         required: true
         type: choice
         default: 'none - 不閃'
         options:
           - 'none - 不閃'
-          - 'blink - 一閃一閃（文字和空白交替）'
-          - 'rainbow - 彩虹變色（會忽略文字顏色）'
+          - 'blink - 背景和文字顏色每格互換（黑底白字 ↔ 白底黑字）'
+          - 'rainbow - 背景輪流換成彩虹七色'
       gif_color:
         description: '文字顏色，留空則依主題 (Text color, HTML/CSS name or #hex, e.g. red / #ff8800; blank = theme default)'
         required: false

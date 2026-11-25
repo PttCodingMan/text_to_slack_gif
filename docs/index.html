@@ -193,7 +193,7 @@ const STRINGS = {
     subtitle: '把文字轉成 50×50 的捲動 GIF，直接當 Slack 自訂 emoji。全部在瀏覽器裡跑。',
     text: '文字', frame: 'Frame（1 = 逐字）', delay: 'Delay (ms)', width: '寬度 (×50px)',
     theme: '主題', color: '文字顏色', colorPh: '依主題',
-    flash: '閃字', flashNone: '不閃', flashBlink: '一閃一閃', flashRainbow: '彩虹變色',
+    flash: '閃背景', flashNone: '不閃', flashBlink: '黑白互換', flashRainbow: '彩虹背景',
     dim: '尺寸', count: '張數', size: '檔案',
     download: '下載 output.gif', previewAlt: 'GIF 預覽',
     footer: 'Slack 自訂 emoji 上限 128 KB。字體用瀏覽器內建的，跟 CLI 版可能略有差異。',
@@ -202,7 +202,7 @@ const STRINGS = {
     subtitle: 'Turn text into a 50×50 scrolling GIF for Slack custom emoji. Runs entirely in your browser.',
     text: 'Text', frame: 'Frame (1 = per char)', delay: 'Delay (ms)', width: 'Width (×50px)',
     theme: 'Theme', color: 'Text color', colorPh: 'theme default',
-    flash: 'Flash', flashNone: 'None', flashBlink: 'Blink', flashRainbow: 'Rainbow',
+    flash: 'Flashing background', flashNone: 'None', flashBlink: 'Swap colors', flashRainbow: 'Rainbow',
     dim: 'Size', count: 'Frames', size: 'File',
     download: 'Download output.gif', previewAlt: 'GIF preview',
     footer: 'Slack caps custom emoji at 128 KB. Fonts come from your browser, so results may differ slightly from the CLI.',
@@ -232,12 +232,12 @@ const FONT = `${IMAGE_SIZE}px "Arial Unicode MS", "Noto Sans CJK TC", "Microsoft
 // Returns a list of canvases, one per GIF frame. Mirrors text_to_gif() in src/app.py.
 function renderFrames({ text, frame, width, bg, fg, flash = 'none' }) {
   const s = text.split(/\s+/).filter(Boolean).join(' ');
-  const make = () => {
+  const make = (fill = bg) => {
     const c = document.createElement('canvas');
     c.width = IMAGE_SIZE * width;
     c.height = IMAGE_SIZE;
     const d = c.getContext('2d', { willReadFrequently: true });
-    d.fillStyle = bg;
+    d.fillStyle = fill;
     d.fillRect(0, 0, c.width, c.height);
     d.font = FONT;
     return [c, d];
@@ -266,21 +266,24 @@ function renderFrames({ text, frame, width, bg, fg, flash = 'none' }) {
   }
   if (!draws.length) return [];
 
-  // a short animation needs enough frames to go through every color
   if (flash === 'rainbow' && draws.length < RAINBOW.length) {
+    // a short animation needs enough frames to go through every color
     draws = Array(Math.ceil(RAINBOW.length / draws.length)).fill(draws).flat();
+  } else if (flash === 'blink' && draws.length % 2) {
+    // an even frame count keeps the blinking steady when the gif loops
+    draws = [...draws, ...draws];
   }
 
-  const frames = [];
-  draws.forEach(([x, t], i) => {
-    const [c, d] = make();
-    d.fillStyle = flash === 'rainbow' ? RAINBOW[i % RAINBOW.length] : fg;
+  return draws.map(([x, t], i) => {
+    let [b, f] = [bg, fg];
+    // every other frame swaps the background and text colors
+    if (flash === 'blink' && i % 2) [b, f] = [fg, bg];
+    else if (flash === 'rainbow') b = RAINBOW[i % RAINBOW.length];
+    const [c, d] = make(b);
+    d.fillStyle = f;
     d.fillText(t, x, BASELINE);
-    frames.push(c);
-    // every frame is followed by an empty one, so the text blinks
-    if (flash === 'blink') frames.push(make()[0]);
+    return c;
   });
-  return frames;
 }
 
 function encodeGif(frames, delay, perFramePalette = false) {
@@ -290,7 +293,7 @@ function encodeGif(frames, delay, perFramePalette = false) {
   for (const c of frames) {
     const data = c.getContext('2d').getImageData(0, 0, width, height).data;
     // ponytail: 32 colours is plenty for anti-aliased 2-tone text and keeps us under Slack's 128 KB.
-    // Rainbow frames each have a different text colour, so they get their own palette.
+    // Rainbow frames each have a different background colour, so they get their own palette.
     if (!palette || perFramePalette) palette = quantize(data, 32);
     gif.writeFrame(applyPalette(data, palette), width, height, { palette, delay, repeat: 0 });
   }

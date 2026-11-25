@@ -85,18 +85,22 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
     if flash == 'rainbow' and len(draws) < len(rainbow_colors):
         # a short animation needs enough frames to go through every color
         draws = draws * -(-len(rainbow_colors) // len(draws))
+    elif flash == 'blink' and len(draws) % 2:
+        # an even frame count keeps the blinking steady when the gif loops
+        draws = draws * 2
 
     images = []
     for i, (x, t) in enumerate(draws):
-        color = rainbow_colors[i % len(rainbow_colors)] if flash == 'rainbow' else text_color
+        bg, fg = background_color, text_color
+        if flash == 'blink' and i % 2:
+            # every other frame swaps the background and text colors
+            bg, fg = fg, bg
+        elif flash == 'rainbow':
+            bg = rainbow_colors[i % len(rainbow_colors)]
 
-        img = new_image(width, background_color)
-        ImageDraw.Draw(img).text((x, y_offset), t, fill=color, font=font)
+        img = new_image(width, bg)
+        ImageDraw.Draw(img).text((x, y_offset), t, fill=fg, font=font)
         images.append(img)
-
-        if flash == 'blink':
-            # every frame is followed by an empty one, so the text blinks
-            images.append(new_image(width, background_color))
 
     if save:
         # output_name = f'{input_string[:5].strip()} in f {frame} d {delay}.gif'
@@ -125,8 +129,8 @@ if __name__ == '__main__':
     parser.add_argument('--theme', type=str, default='dark', choices=['dark', 'light'],
                         help="The theme of the gif; string, default: dark")
     parser.add_argument('--flash', type=str, default='none', choices=flash_modes,
-                        help="Flashing effect: none, blink (text and blank frames alternate), "
-                             "rainbow (text cycles through colors, overrides --color); default: none")
+                        help="Flashing background: none, blink (background and text colors swap every frame), "
+                             "rainbow (background cycles through colors); default: none")
     args = parser.parse_args()
 
     if args.theme == 'dark':

@@ -18,7 +18,7 @@ And the more important thing is it saves your time!
    | --- | --- | --- |
    | Text | The text to convert | 臣亮言… |
    | Theme | `dark` (white text on black) or `light` (black text on white) | `dark` |
-   | Flash | `none`, `blink` (text and blank frames alternate) or `rainbow` (text cycles through colors) | `none` |
+   | Flashing background | `none`, `blink` (background and text colors swap every frame) or `rainbow` (background cycles through colors) | `none` |
    | Text color | HTML/CSS color name or hex (e.g. `red`, `#ff8800`); leave blank to use the theme color | blank |
    | Frames per character | `1` shows one character at a time; larger values scroll more smoothly | `5` |
    | Delay | Milliseconds per frame; smaller is faster | `100` |
@@ -68,13 +68,13 @@ Add `--theme <dark/light>` argument to change the theme of the gif. Default is `
 python3 src/app.py --theme light -t "臣亮言..."
 ```
 
-## Flashing text
+## Flashing background
 
-Add `--flash <none/blink/rainbow>` argument to make the text flash. Default is `none`.
+Add `--flash <none/blink/rainbow>` argument to make the background flash. Default is `none`.
 
 - `none`: No flashing.
-- `blink`: Every frame is followed by an empty frame, so the text blinks.
-- `rainbow`: The text cycles through rainbow colors. This overrides `--color`.
+- `blink`: The background and text colors swap every frame, e.g. white on black ↔ black on white.
+- `rainbow`: The background cycles through rainbow colors; the text keeps its color.
 
 ```bash
 python3 src/app.py -f 1 --flash blink -t "急"
