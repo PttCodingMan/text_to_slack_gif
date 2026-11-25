@@ -12,8 +12,19 @@ And the more important thing is it saves your time!
 2. Go to the Actions tab and enable workflows.
 3. Select `build gif` workflow.
 4. Click `Run workflow` button.
-5. Input the text you want to convert.
-6. Download the gif from the Artifacts.
+5. Input the text you want to convert, and adjust the other options if you like:
+
+   | Option | Description | Default |
+   | --- | --- | --- |
+   | Text | The text to convert | 臣亮言… |
+   | Theme | `dark` (white text on black) or `light` (black text on white) | `dark` |
+   | Text color | HTML/CSS color name or hex (e.g. `red`, `#ff8800`); leave blank to use the theme color | blank |
+   | Frames per character | `1` shows one character at a time; larger values scroll more smoothly | `5` |
+   | Delay | Milliseconds per frame; smaller is faster | `100` |
+   | Width | Image width in characters; `1` is a square emoji | `1` |
+   | File name | Name of the downloaded gif (without `.gif`) | `slack-gif` |
+
+6. Download the gif from the Artifacts. The run summary also lists the options that were used.
 
 ### Run on your local machine
 

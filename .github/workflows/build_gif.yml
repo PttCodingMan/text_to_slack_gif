@@ -1,31 +1,56 @@
-
 name: build gif
 
 on:
   workflow_dispatch:
     inputs:
       gif_text:
-        description: 'Gif to build'
+        description: '要轉成 GIF 的文字 (Text to convert)'
         required: true
+        type: string
         default: '臣亮言：先帝創業未半，而中道崩殂；今天下三分，益州疲敝，此誠危急存亡之秋也。'
+      gif_theme:
+        description: '主題配色 (Theme)'
+        required: true
+        type: choice
+        default: 'dark - 黑底白字'
+        options:
+          - 'dark - 黑底白字'
+          - 'light - 白底黑字'
+      gif_color:
+        description: '文字顏色，留空則依主題 (Text color, HTML/CSS name or #hex, e.g. red / #ff8800; blank = theme default)'
+        required: false
+        type: string
+        default: ''
       gif_frame:
-        description: 'Gif frame'
+        description: '每個字的捲動格數：1 = 逐字跳出，數字越大捲動越平滑 (Frames per character; 1 = one character at a time)'
         required: true
-        default: '5'
+        type: number
+        default: 5
       gif_delay:
-        description: 'Gif delay'
+        description: '每格停留毫秒數，數字越小越快 (Delay per frame in ms; smaller = faster)'
         required: true
-        default: '100'
+        type: number
+        default: 100
+      gif_width:
+        description: '畫面寬度，以「字」為單位：1 = 正方形 emoji，數字越大越寬 (Image width in characters; 1 = square emoji)'
+        required: true
+        type: number
+        default: 1
+      gif_name:
+        description: '下載的檔名，不含 .gif (Output file name, without .gif)'
+        required: false
+        type: string
+        default: 'slack-gif'
 
 jobs:
   build-gif:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -35,11 +60,55 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build gif
+        id: build
+        env:
+          GIF_TEXT: ${{ inputs.gif_text }}
+          GIF_THEME: ${{ inputs.gif_theme }}
+          GIF_COLOR: ${{ inputs.gif_color }}
+          GIF_FRAME: ${{ inputs.gif_frame }}
+          GIF_DELAY: ${{ inputs.gif_delay }}
+          GIF_WIDTH: ${{ inputs.gif_width }}
+          GIF_NAME: ${{ inputs.gif_name }}
         run: |
-          python src/app.py -t "${{ github.event.inputs.gif_text }}" -f ${{ github.event.inputs.gif_frame }} -d ${{ github.event.inputs.gif_delay }}
+          trim() { local s="$1"; s="${s#"${s%%[![:space:]]*}"}"; printf '%s' "${s%"${s##*[![:space:]]}"}"; }
+
+          # Option labels look like "dark - 黑底白字"; keep only the first word.
+          theme="${GIF_THEME%% *}"
+
+          args=(-t "$GIF_TEXT" -f "$GIF_FRAME" -d "$GIF_DELAY" -w "$GIF_WIDTH" --theme "$theme")
+          color="$(trim "$GIF_COLOR")"
+          if [ -n "$color" ]; then
+            args+=(-c "$color")
+          fi
+
+          python src/app.py "${args[@]}"
+
+          # Artifact names cannot contain: " : < > | * ? \ / or newlines.
+          name="$(trim "$(printf '%s' "$GIF_NAME" | tr -d '\r\n' | tr '":<>|*?\\/' '_________')")"
+          name="${name%.gif}"
+          if [ -z "$name" ]; then
+            name="slack-gif"
+          fi
+          mv output.gif "$name.gif"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "### GIF built: \`$name.gif\`"
+            echo ""
+            echo "| Option | Value |"
+            echo "| --- | --- |"
+            echo "| Text | $GIF_TEXT |"
+            echo "| Theme | $theme |"
+            echo "| Text color | ${color:-(theme default)} |"
+            echo "| Frames per character | $GIF_FRAME |"
+            echo "| Delay (ms) | $GIF_DELAY |"
+            echo "| Width | $GIF_WIDTH |"
+            echo ""
+            echo "Download it from the **Artifacts** section below."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload gif
         uses: actions/upload-artifact@v4
         with:
-          name: YOUR_GIF_IS_HERE
-          path: output.gif
+          name: ${{ steps.build.outputs.name }}
+          path: ${{ steps.build.outputs.name }}.gif

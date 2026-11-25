@@ -112,7 +112,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
     parser.add_argument('-c', '--color', type=str, default=None,
                         help="The text HTML/CSS Color Name; string, default: black")
-    parser.add_argument('-w', '--width', type=int, default=default_width,
+    parser.add_argument('-w', '--width', type=check_positive, default=default_width,
                         help="The width of image; integer; default: 1")
     parser.add_argument('--theme', type=str, default='dark', choices=['dark', 'light'],
                         help="The theme of the gif; string, default: dark")
