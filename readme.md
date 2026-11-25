@@ -19,6 +19,7 @@ And the more important thing is it saves your time!
    | Text | The text to convert | 臣亮言… |
    | Theme | `dark` (white text on black) or `light` (black text on white) | `dark` |
    | Flashing background | `none`, `blink` (background and text colors swap every frame) or `rainbow` (background cycles through colors) | `none` |
+   | Flash interval | Milliseconds between background color changes; smaller is faster | `50` |
    | Text color | HTML/CSS color name or hex (e.g. `red`, `#ff8800`); leave blank to use the theme color | blank |
    | Frames per character | `1` shows one character at a time; larger values scroll more smoothly | `5` |
    | Delay | Milliseconds per frame; smaller is faster | `100` |
@@ -75,6 +76,9 @@ Add `--flash <none/blink/rainbow>` argument to make the background flash. Defaul
 - `none`: No flashing.
 - `blink`: The background and text colors swap every frame, e.g. white on black ↔ black on white.
 - `rainbow`: The background cycles through rainbow colors; the text keeps its color.
+
+Add `--flash-delay <int>` to set how many milliseconds pass between color changes. Default is `50`.
+It is independent of `-d`, so the text can stay put while the background flashes several times.
 
 ```bash
 python3 src/app.py -f 1 --flash blink -t "急"
