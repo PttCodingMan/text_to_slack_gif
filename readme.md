@@ -12,8 +12,21 @@ And the more important thing is it saves your time!
 2. Go to the Actions tab and enable workflows.
 3. Select `build gif` workflow.
 4. Click `Run workflow` button.
-5. Input the text you want to convert.
-6. Download the gif from the Artifacts.
+5. Input the text you want to convert, and adjust the other options if you like:
+
+   | Option | Description | Default |
+   | --- | --- | --- |
+   | Text | The text to convert | 臣亮言… |
+   | Theme | `dark` (white text on black) or `light` (black text on white) | `dark` |
+   | Flashing background | `none`, `blink` (background and text colors swap every frame) or `rainbow` (background cycles through colors) | `none` |
+   | Flash interval | Milliseconds between background color changes; smaller is faster | `50` |
+   | Text color | HTML/CSS color name or hex (e.g. `red`, `#ff8800`); leave blank to use the theme color | blank |
+   | Frames per character | `1` shows one character at a time; larger values scroll more smoothly | `5` |
+   | Delay | Milliseconds per frame; smaller is faster | `100` |
+   | Width | Image width in characters; `1` is a square emoji | `1` |
+   | File name | Name of the downloaded gif (without `.gif`) | `slack-gif` |
+
+6. Download the gif from the Artifacts. The run summary also lists the options that were used.
 
 ### Run on your local machine
 
@@ -54,6 +67,22 @@ Add `--theme <dark/light>` argument to change the theme of the gif. Default is `
 
 ```bash
 python3 src/app.py --theme light -t "臣亮言..."
+```
+
+## Flashing background
+
+Add `--flash <none/blink/rainbow>` argument to make the background flash. Default is `none`.
+
+- `none`: No flashing.
+- `blink`: The background and text colors swap every frame, e.g. white on black ↔ black on white.
+- `rainbow`: The background cycles through rainbow colors; the text keeps its color.
+
+Add `--flash-delay <int>` to set how many milliseconds pass between color changes. Default is `50`.
+It is independent of `-d`, so the text can stay put while the background flashes several times.
+
+```bash
+python3 src/app.py -f 1 --flash blink -t "急"
+python3 src/app.py --flash rainbow -t "臣亮言..."
 ```
 
 ## Font color
