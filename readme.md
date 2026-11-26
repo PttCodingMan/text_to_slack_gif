@@ -4,9 +4,9 @@
 
 **線上直接用：<https://pttcodingman.github.io/text_to_slack_gif/>**（免安裝，打開瀏覽器就能產生、預覽、下載）
 
-| 黑底白字 | 白底黑字 | 自訂背景 | 閃字 | 紅黃閃字 | 彩虹背景 | 自訂彩虹 |
+| 黑底白字 | 白底黑字 | 自訂背景 | 閃字 | 紅黃閃字 | 彩虹換色 | 自訂換色 |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="104" alt="白底黑字"> | <img src="examples/background.gif" width="100" alt="深藍底金字"> | <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/alert.gif" width="100" alt="紅黃閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/rainbow-custom.gif" width="100" alt="自訂彩虹"> |
+| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="104" alt="白底黑字"> | <img src="examples/background.gif" width="100" alt="深藍底金字"> | <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/alert.gif" width="100" alt="紅黃閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹換色"> | <img src="examples/rainbow-custom.gif" width="100" alt="自訂換色"> |
 
 範例圖都是 50×50 的原尺寸放大兩倍顯示，每個選項的更多範例見 [選項說明](#選項說明)。白底範例外圍的灰框是為了在白色頁面上看得清楚另外加的，實際產生的 GIF 沒有框。
 
@@ -75,9 +75,9 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 | 每字格數 | `-f`, `--frame` | 每個字捲動幾格；`1` 是逐字跳出，數字越大捲動越平滑 | `5` |
 | 每格毫秒 | `-d`, `--delay` | 每格停留幾毫秒，越小越快 | `100` |
 | 寬度 | `-w`, `--width` | 畫面寬度，以「字」為單位；`1` 是 50×50 的正方形 emoji | `1` |
-| 閃爍效果 | `--flash` | `none` 不閃、`blink` 閃字（背景和文字顏色互換）、`rainbow` 彩虹背景 | `none` |
+| 閃爍效果 | `--flash` | `none` 不閃、`blink` 閃字（背景和文字顏色互換）、`rainbow` 背景換色（背景在幾個顏色之間輪流閃） | `none` |
 | 閃爍間隔 | `--flash-delay` | 每隔幾毫秒換一次顏色，越小閃越快；和每格毫秒分開算 | `50` |
-| 彩虹的顏色 | `--flash-colors` | 彩虹背景輪流的顏色，至少兩個，用逗號分隔 | 彩虹七色 |
+| 背景輪流的顏色 | `--flash-colors` | 背景換色時輪流的顏色，至少兩個，用逗號分隔 | 彩虹七色 |
 
 下面逐一說明每個選項的效果，以及怎麼搭配使用。
 
@@ -165,22 +165,22 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 | --- | --- |
 | `none` | 不閃（預設） |
 | `blink` | **閃字：背景和文字顏色互換。** 預設是黑底白字 ↔ 白底黑字輪流切換，看起來字和背景一起在閃。 |
-| `rainbow` | **彩虹背景：背景輪流換色**，文字顏色不變。預設是彩虹七色（紅、橙、黃、綠、青、藍、紫），可以用 `--flash-colors` 換成自己的顏色。 |
+| `rainbow` | **背景換色：背景在幾個顏色之間輪流閃**，文字顏色不變。預設是彩虹七色（紅、橙、黃、綠、青、藍、紫），可以換成自己挑的顏色（見下方）。 |
 
 | `--flash blink` | `--flash rainbow` | `--flash rainbow -c black` | `-f 1 -d 500 --flash blink` | `-f 1 -d 500 --flash rainbow` |
 | :---: | :---: | :---: | :---: | :---: |
-| <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/rainbow-black.gif" width="100" alt="彩虹背景黑字"> | <img src="examples/blink-char.gif" width="100" alt="急 閃爍"> | <img src="examples/rainbow-char.gif" width="100" alt="讚 彩虹"> |
+| <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹換色"> | <img src="examples/rainbow-black.gif" width="100" alt="彩虹換色黑字"> | <img src="examples/blink-char.gif" width="100" alt="急 閃爍"> | <img src="examples/rainbow-char.gif" width="100" alt="讚 彩虹換色"> |
 
 後兩個是單一個字（「急」、「讚」）配逐字模式，最常拿來當 emoji。白字在彩虹的亮色背景上比較不明顯，可以用 `-c black` 之類的深色字。
 
 #### 自訂閃爍的顏色組合
 
 - **閃字**：互換的兩個顏色就是文字顏色和背景顏色，所以用 `-c`、`-b` 就能自訂。例如 `-c yellow -b red` 是紅底黃字 ↔ 黃底紅字。
-- **彩虹背景**：用 `--flash-colors` 指定輪流的背景色，至少兩個，用逗號分隔，例如 `--flash-colors "#ff4fa3,#ffd400,#00d1ff"`。只有搭配 `--flash rainbow` 才有作用，指令版搭配其他模式會報錯。
+- **背景換色**：想讓背景在自己挑的幾個顏色之間閃，就選背景換色，再到網頁版的「背景輪流的顏色」填顏色（指令版用 `--flash-colors`）。至少兩個，用逗號分隔，例如 `red, yellow, blue`。這個欄位只在背景換色時有作用，指令版搭配其他模式會報錯。
 
 | `--flash blink -b red -c yellow` | `-f 1 -d 500 --flash blink -b red -c yellow` | `-f 1 -d 500 --flash rainbow --flash-colors "#ff4fa3,#ffd400,#00d1ff" -c black` |
 | :---: | :---: | :---: |
-| <img src="examples/blink-custom.gif" width="100" alt="紅黃閃字"> | <img src="examples/alert.gif" width="100" alt="急 紅黃閃字"> | <img src="examples/rainbow-custom.gif" width="100" alt="讚 自訂彩虹"> |
+| <img src="examples/blink-custom.gif" width="100" alt="紅黃閃字"> | <img src="examples/alert.gif" width="100" alt="急 紅黃閃字"> | <img src="examples/rainbow-custom.gif" width="100" alt="讚 自訂換色"> |
 
 #### 閃爍速度 `--flash-delay`
 
@@ -221,10 +221,10 @@ python3 src/app.py --flash blink -b red -c yellow -t "臣亮言：先帝創業�
 # 單一個字，每 0.5 秒一輪，紅黃快速閃爍
 python3 src/app.py -f 1 -d 500 --flash blink -b red -c yellow -t "急"
 
-# 彩虹背景，黑字
+# 背景換色（彩虹七色），黑字
 python3 src/app.py --flash rainbow -c black -t "臣亮言：先帝創業未半"
 
-# 自訂彩虹的顏色
+# 背景換色，自己挑顏色
 python3 src/app.py -f 1 -d 500 --flash rainbow --flash-colors "#ff4fa3,#ffd400,#00d1ff" -c black -t "讚"
 
 # 逐字跳出

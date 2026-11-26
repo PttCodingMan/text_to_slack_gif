@@ -182,13 +182,13 @@ if __name__ == '__main__':
                         help="The theme of the gif; string, default: dark")
     parser.add_argument('--flash', type=str, default='none', choices=flash_modes,
                         help="Flashing background: none, blink (background and text colors swap every frame), "
-                             "rainbow (background cycles through colors); default: none")
+                             "rainbow (color cycle: the background rotates through --flash-colors); default: none")
     parser.add_argument('--flash-delay', type=check_positive, default=default_flash_delay,
                         help="Milliseconds between background color changes when flashing; "
                              "smaller is faster; default: 50")
     parser.add_argument('--flash-colors', type=check_color_list, default=None,
-                        help="Comma-separated backgrounds for --flash rainbow to cycle through, "
-                             "e.g. 'red,gold'; default: the 7 rainbow colors")
+                        help="Comma-separated backgrounds for the color cycle (--flash rainbow), "
+                             "e.g. 'red,yellow,blue'; default: the 7 rainbow colors")
     args = parser.parse_args()
 
     if args.flash_colors and args.flash != 'rainbow':
