@@ -4,14 +4,21 @@
 
 不用再到好幾個線上服務之間轉檔、裁切、壓縮，一個指令（或在 GitHub 上點幾下）就完成。
 
-![臣亮言 範例](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
+**線上直接用：<https://pttcodingman.github.io/text_to_slack_gif/>**（免安裝、免 fork，打開瀏覽器就能產生）
+
+| 黑底白字 | 白底黑字 | 閃字 | 彩虹背景 | 單字閃爍 |
+| :---: | :---: | :---: | :---: | :---: |
+| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="104" alt="白底黑字"> | <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/blink-char.gif" width="100" alt="單字閃爍"> |
+| 預設 | `--theme light` | `--flash blink` | `--flash rainbow` | `-f 1 -d 500 --flash blink` |
+
+範例圖都是 50×50 的原尺寸放大兩倍顯示，每個選項的更多範例見 [選項說明](#選項說明)。白底範例外圍的灰框是為了在白色頁面上看得清楚另外加的，實際產生的 GIF 沒有框。
 
 ## 三種用法
 
 | 用法 | 適合 | 需要什麼 |
 | --- | --- | --- |
+| [網頁版](https://pttcodingman.github.io/text_to_slack_gif/) | 想邊調參數邊看預覽，最快上手 | 瀏覽器就好 |
 | [在 GitHub Actions 上跑](#在-github-actions-上跑免安裝) | 不想在電腦上裝 Python | GitHub 帳號 |
-| [網頁版](#網頁版) | 想邊調參數邊看預覽 | 瀏覽器 |
 | [在自己電腦上跑](#在自己電腦上跑) | 常常要產生、想寫成腳本 | Python 3.9 以上 |
 
 ## 在 GitHub Actions 上跑（免安裝）
@@ -53,9 +60,11 @@ GitHub 預設會關閉 fork 出來的 repo 的 workflow。
 
 ## 網頁版
 
-`docs/index.html` 是純前端的版本，全部在瀏覽器裡跑，可以即時預覽、直接下載。字型用的是瀏覽器內建字型，所以結果可能跟 Python 版略有差異。
+直接打開 <https://pttcodingman.github.io/text_to_slack_gif/> 就能用，不需要 GitHub 帳號，也不用 fork。
 
-想放到線上，可以在你的 fork 開 GitHub Pages：
+網頁版的原始碼是 `docs/index.html`，是純前端的版本，全部在瀏覽器裡跑，可以即時預覽、直接下載。上方的「風格範例」會用你輸入的文字預覽黑底、白底、閃字、彩虹等效果，點一下就套用那組設定；每個欄位下面也有簡短說明。字型用的是瀏覽器內建字型，所以結果可能跟 Python 版略有差異。
+
+想架一份自己的（例如改了程式想自己用），可以在你的 fork 開 GitHub Pages：
 
 1. 到 fork 的 **Settings** → **Pages**。
 2. **Source** 選 **Deploy from a branch**，Branch 選 `master`、資料夾選 `/docs`，按 **Save**。
@@ -99,55 +108,151 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 | Width | `-w`, `--width` | 畫面寬度，以「字」為單位；`1` 是 50×50 的正方形 emoji | `1` |
 | File name | — | 下載檔名（不含 `.gif`），只有 Actions 版有 | `slack-gif` |
 
-## 範例
+下面逐一說明每個選項的效果，以及怎麼搭配使用。
 
-調整 `-f`（每字格數）和 `-d`（每格毫秒數）可以做出不同節奏的效果。
+### 文字 `-t` / Text
 
-預設：平滑捲動
+要顯示的內容，中英文和標點符號都可以（字型不支援彩色 emoji，會顯示不出來）。
+
+- 連續的空白和換行會被合併成一個空格。
+- 逐字模式（`-f 1`）會跳過空白，英文字母會置中，中文字則靠左對齊並填滿畫面。
+- 文字越長，GIF 張數越多、檔案越大。
+
+### 主題 `--theme` / Theme
+
+決定預設的背景色和文字顏色：
+
+| 值 | 背景 | 文字 |
+| --- | --- | --- |
+| `dark` | 黑 | 白 |
+| `light` | 白 | 黑 |
+
+| `--theme dark`（預設） | `--theme light` |
+| :---: | :---: |
+| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="104" alt="白底黑字"> |
+
+主題只決定「預設」顏色；用 `-c` 指定文字顏色後，背景仍然照主題。
+
+### 文字顏色 `-c` / Text color
+
+覆蓋主題的文字顏色，支援這些寫法：
+
+- 色名：`red`、`gold`、`blueviolet`（[CSS 色名列表](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color)）
+- 16 進位：`#f80`、`#ff8800`
+- 函式：`rgb(255, 136, 0)`、`hsl(32, 100%, 50%)`
+
+| `-c gold` |
+| :---: |
+| <img src="examples/color.gif" width="100" alt="黑底金字"> |
+
+寫錯色名會直接報錯（`unknown color specifier`），在 Actions 上會看到執行失敗的紅叉。
+
+### 捲動方式 `-f` / Frames per character
+
+決定文字「怎麼動」：
+
+- **`-f 1`：逐字跳出。** 一格顯示一個字，像跑馬燈一樣一個字一個字換。適合短詞，或搭配閃爍做「急」、「讚」這類單字 emoji。
+- **`-f 2` 以上：平滑捲動。** 整串文字從右往左滑過畫面，每個字要滑 `f` 格才會完全移過去。數字越大越平滑，但張數也越多（大約是「字數 × f」張）。
+
+| `-f 1 -d 500`：逐字跳出 | `-f 5`（預設）：平滑捲動 |
+| :---: | :---: |
+| <img src="examples/step.gif" width="100" alt="逐字跳出"> | <img src="examples/dark.gif" width="100" alt="平滑捲動"> |
+
+可以填 `1`～`50`，建議用 `1`～`10`。畫面只有 50 px 寬，每格至少要移動 1 px，所以上限是 `50`：指令版和 Actions 填超過會直接報錯，網頁版則會自動當成 `50`。
+
+### 速度 `-d` / Delay
+
+每一格停留幾毫秒，數字越小越快。
+
+- 逐字模式下就是每個字停多久，例如 `-f 1 -d 500` 是每個字停 0.5 秒。
+- 捲動模式下，一個字滑過去的時間大約是 `f × d` 毫秒，例如預設 `-f 5 -d 100` 是每個字 0.5 秒。想要同樣捲動速度但更平滑，可以把 `f` 加倍、`d` 減半。
+- GIF 的時間單位是 10 毫秒，數值會被四捨五入到 10 的倍數。
+- 很多瀏覽器和 App 會把 20 毫秒以下的格子放慢成 100 毫秒，所以 `-d` 不要低於 `20`。
+
+| `-d 100`（預設） | `-d 30`：快速捲動 |
+| :---: | :---: |
+| <img src="examples/dark.gif" width="100" alt="預設速度"> | <img src="examples/fast.gif" width="100" alt="快速捲動"> |
+
+### 寬度 `-w` / Width
+
+畫面寬度，以「字」為單位，高度固定 50 px：
+
+- `-w 1`：50×50 正方形，最適合當 emoji。
+- `-w 4`：200×50 的橫幅，一次能看到好幾個字，適合搭配捲動模式。
+
+逐字模式（`-f 1`）的字只會出現在最左邊那格，所以寬度大於 1 時建議用捲動模式。
+
+`-w 4`：
+
+<img src="examples/wide.gif" width="400" alt="200×50 橫幅">
+
+### 閃爍效果 `--flash` / Flashing background
+
+讓背景閃爍，做出「警告」、「慶祝」之類很吵的 emoji。有三種模式：
+
+| 值 | 效果 |
+| --- | --- |
+| `none` | 不閃（預設） |
+| `blink` | **背景和文字顏色互換**：黑底白字 ↔ 白底黑字輪流切換，看起來字和背景一起在閃。有設 `-c` 的話就是兩個顏色互換，例如 `-c red` 會變成黑底紅字 ↔ 紅底黑字。 |
+| `rainbow` | **背景輪流換成彩虹七色**（紅、橙、黃、綠、青、藍、紫），文字顏色不變。白字在亮色背景上比較不明顯，可以用 `-c black` 之類的深色字試試。 |
+
+| `--flash blink` | `--flash rainbow` | `--flash rainbow -c black` | `-f 1 -d 500 --flash blink` | `-f 1 -d 500 --flash rainbow` |
+| :---: | :---: | :---: | :---: | :---: |
+| <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/rainbow-black.gif" width="100" alt="彩虹背景黑字"> | <img src="examples/blink-char.gif" width="100" alt="急 閃爍"> | <img src="examples/rainbow-char.gif" width="100" alt="讚 彩虹"> |
+
+後兩個是單一個字（「急」、「讚」）配逐字模式，最常拿來當 emoji。
+
+**閃爍速度 `--flash-delay` / Flash interval**
+
+每隔幾毫秒換一次背景色，預設 `50`，數字越小閃越快。它和 `-d` 是分開的：文字的移動節奏照 `-d`，背景在這段時間內另外閃好幾下。例如：
 
 ```bash
-python3 src/app.py -t "臣亮言..."
+# 每個字停 0.5 秒，這段時間內背景每 0.05 秒換一次色（閃 10 下）
+python3 src/app.py -f 1 -d 500 --flash blink --flash-delay 50 -t "急"
 ```
 
-![f 5 d 100](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
+幾個要注意的地方：
 
-逐字跳出，每個字停 0.5 秒
+- 實際的閃爍間隔是「把 `-d` 平均切成幾段」算出來的，所以會是接近、但不一定剛好等於你填的數字。
+- 每段最短 20 毫秒（理由同上，太短會被瀏覽器放慢），填更小的值也只會閃到 20 毫秒。
+- 如果 `--flash-delay` 比 `-d` 還大，就是每格換一次色，閃爍速度等於文字移動速度。
+- 閃爍會讓張數變成好幾倍，檔案也會跟著變大。為了讓循環播放時不會斷拍，`blink` 會讓總張數維持偶數；很短的 `rainbow` 動畫會重複到七個顏色都輪過一次。
 
-```bash
-python3 src/app.py -f 1 -d 500 -t "臣亮言..."
-```
+## 範例指令
 
-![f 1 d 500](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%201%20d%20500.gif)
-
-快速捲動
-
-```bash
-python3 src/app.py -d 30 -t "臣亮言..."
-```
-
-![f 5 d 30](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
-
-其他組合：
+上面的範例圖都放在 [`examples/`](examples)，用下面的指令產生（產生的檔案都叫 `output.gif`）：
 
 ```bash
+# 黑底白字（預設）
+python3 src/app.py -t "臣亮言：先帝創業未半"
+
 # 白底黑字
-python3 src/app.py --theme light -t "臣亮言..."
+python3 src/app.py --theme light -t "臣亮言：先帝創業未半"
 
-# 紫色字、5 個字寬的橫幅
-python3 src/app.py -c blueviolet -w 5 -t "臣亮言..."
+# 閃字：黑底白字 ↔ 白底黑字互換
+python3 src/app.py --flash blink -t "臣亮言：先帝創業未半"
 
-# 單一個字，黑白快速閃爍
-python3 src/app.py -f 1 --flash blink -t "急"
+# 彩虹背景，黑字
+python3 src/app.py --flash rainbow -c black -t "臣亮言：先帝創業未半"
 
-# 彩虹背景
-python3 src/app.py --flash rainbow -t "臣亮言..."
+# 單一個字，每 0.5 秒一輪，背景快速閃爍
+python3 src/app.py -f 1 -d 500 --flash blink -t "急"
+
+# 金色字
+python3 src/app.py -c gold -t "臣亮言：先帝創業未半"
+
+# 逐字跳出
+python3 src/app.py -f 1 -d 500 -t "臣亮言：先帝創業未半"
+
+# 4 個字寬的橫幅
+python3 src/app.py -w 4 -t "臣亮言：先帝創業未半"
 ```
 
 ## 上傳到 Slack
 
 在 Slack 的訊息輸入框點 emoji 圖示 → **Add Emoji**（新增表情符號），上傳 GIF 並取個名字即可。
 
-Slack 自訂 emoji 的檔案上限是 128 KB。如果太大，可以縮短文字、把 `-f` 調小，或把 `-d` 調大以減少張數。
+Slack 自訂 emoji 的檔案上限是 128 KB。如果太大，可以縮短文字、把 `-f` 調小、關掉閃爍，或把 `--flash-delay` 調大以減少張數。
 
 ## License
 

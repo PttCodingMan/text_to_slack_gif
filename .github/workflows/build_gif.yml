@@ -36,7 +36,7 @@ on:
         type: string
         default: ''
       gif_frame:
-        description: '每個字的捲動格數：1 = 逐字跳出，數字越大捲動越平滑 (Frames per character; 1 = one character at a time)'
+        description: '每個字的捲動格數，1～50：1 = 逐字跳出，數字越大捲動越平滑 (Frames per character, 1-50; 1 = one character at a time)'
         required: true
         type: number
         default: 5

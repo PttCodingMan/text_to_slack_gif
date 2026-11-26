@@ -53,9 +53,33 @@
 
   .field { display: grid; gap: .4rem; }
   .field > span { font-size: .8rem; font-weight: 500; color: var(--fg-dim); letter-spacing: .02em; }
+  .hint { font-size: .75rem; line-height: 1.45; color: var(--fg-dim); opacity: .85; }
+  .field > .hint { margin-top: -.25rem; }
+
+  .card h2 { margin: 0; font-size: 1rem; font-weight: 600; letter-spacing: -0.01em; }
+  .card h2 + .hint { margin: .2rem 0 1rem; }
+  .presets { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+  .presets button {
+    display: grid; justify-items: center; gap: .45rem;
+    min-height: 44px; padding: .7rem .4rem .55rem;
+    background: var(--muted); color: var(--fg);
+    border: 1px solid var(--border); border-radius: 8px;
+    font: 500 .8rem/1.3 Inter, system-ui, sans-serif; cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
+  }
+  .presets button:hover { border-color: #43536e; background: #2c3549; }
+  .presets button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .presets button[aria-pressed="true"] { border-color: var(--accent); }
+  .presets img { width: 64px; height: 64px; image-rendering: pixelated; display: block; background: var(--surface); }
   .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); margin-top: 1rem; }
   /* labels wrap to different heights; pin the inputs to the bottom so the row stays aligned */
   .grid > .field { align-content: end; }
+  /* where supported, line up labels, hints and inputs across each row */
+  @supports (grid-template-rows: subgrid) {
+    .grid > .field { grid-row: span 3; grid-template-rows: subgrid; row-gap: .4rem; align-content: normal; }
+    .grid > .field > .hint { margin-top: -.25rem; align-self: start; }
+    .grid > .field > input, .grid > .field > select { align-self: end; }
+  }
 
   input, select {
     width: 100%;
@@ -139,26 +163,47 @@
     </div>
   </header>
 
+  <section class="card" aria-labelledby="presets-title">
+    <h2 id="presets-title" data-i18n="presets"></h2>
+    <p class="hint" data-i18n="presetsHint"></p>
+    <div class="presets" id="presets">
+      <button type="button" data-preset="dark"><img alt=""><span data-i18n="pDark"></span></button>
+      <button type="button" data-preset="light"><img alt=""><span data-i18n="pLight"></span></button>
+      <button type="button" data-preset="blink"><img alt=""><span data-i18n="pBlink"></span></button>
+      <button type="button" data-preset="rainbow"><img alt=""><span data-i18n="pRainbow"></span></button>
+      <button type="button" data-preset="rainbowBlack"><img alt=""><span data-i18n="pRainbowBlack"></span></button>
+      <button type="button" data-preset="step"><img alt=""><span data-i18n="pStep"></span></button>
+      <button type="button" data-preset="stepBlink"><img alt=""><span data-i18n="pStepBlink"></span></button>
+      <button type="button" data-preset="gold"><img alt=""><span data-i18n="pGold"></span></button>
+    </div>
+  </section>
+
   <section class="card">
     <label class="field"><span data-i18n="text"></span>
+      <small class="hint" data-i18n="textHint"></small>
       <input type="text" id="text" value="臣亮言 先帝創業未半 而中道崩殂">
     </label>
     <div class="grid">
-      <label class="field"><span data-i18n="frame"></span><input type="number" id="frame" value="5" min="1"></label>
-      <label class="field"><span data-i18n="delay"></span><input type="number" id="delay" value="100" min="1"></label>
-      <label class="field"><span data-i18n="width"></span><input type="number" id="width" value="1" min="1"></label>
-      <label class="field"><span data-i18n="theme"></span>
-        <select id="theme"><option value="dark">dark</option><option value="light">light</option></select>
+      <label class="field"><span data-i18n="frame"></span><small class="hint" data-i18n="frameHint"></small>
+        <input type="number" id="frame" value="5" min="1" max="50"></label>
+      <label class="field"><span data-i18n="delay"></span><small class="hint" data-i18n="delayHint"></small>
+        <input type="number" id="delay" value="100" min="1"></label>
+      <label class="field"><span data-i18n="width"></span><small class="hint" data-i18n="widthHint"></small>
+        <input type="number" id="width" value="1" min="1"></label>
+      <label class="field"><span data-i18n="theme"></span><small class="hint" data-i18n="themeHint"></small>
+        <select id="theme"><option value="dark" data-i18n="themeDark"></option><option value="light" data-i18n="themeLight"></option></select>
       </label>
-      <label class="field"><span data-i18n="flash"></span>
+      <label class="field"><span data-i18n="flash"></span><small class="hint" data-i18n="flashHint"></small>
         <select id="flash">
           <option value="none" data-i18n="flashNone"></option>
           <option value="blink" data-i18n="flashBlink"></option>
           <option value="rainbow" data-i18n="flashRainbow"></option>
         </select>
       </label>
-      <label class="field"><span data-i18n="flashDelay"></span><input type="number" id="flashDelay" value="50" min="20" step="10"></label>
-      <label class="field"><span data-i18n="color"></span><input type="text" id="color" data-i18n-ph="colorPh"></label>
+      <label class="field"><span data-i18n="flashDelay"></span><small class="hint" data-i18n="flashDelayHint"></small>
+        <input type="number" id="flashDelay" value="50" min="20" step="10"></label>
+      <label class="field"><span data-i18n="color"></span><small class="hint" data-i18n="colorHint"></small>
+        <input type="text" id="color" data-i18n-ph="colorPh"></label>
     </div>
   </section>
 
@@ -192,20 +237,36 @@ import { GIFEncoder, quantize, applyPalette } from 'https://cdn.jsdelivr.net/npm
 const STRINGS = {
   zh: {
     subtitle: '把文字轉成 50×50 的捲動 GIF，直接當 Slack 自訂 emoji。全部在瀏覽器裡跑。',
-    text: '文字', frame: 'Frame（1 = 逐字）', delay: 'Delay (ms)', width: '寬度 (×50px)',
-    theme: '主題', color: '文字顏色', colorPh: '依主題',
-    flash: '閃背景', flashNone: '不閃', flashBlink: '黑白互換', flashRainbow: '彩虹背景',
-    flashDelay: '閃的間隔 (ms)',
+    presets: '風格範例', presetsHint: '用你輸入的文字預覽各種效果，點一下就套用那組設定。',
+    pDark: '黑底白字', pLight: '白底黑字', pBlink: '閃字', pRainbow: '彩虹背景',
+    pRainbowBlack: '彩虹背景黑字', pStep: '逐字跳出', pStepBlink: '逐字閃爍', pGold: '金色字',
+    text: '文字', textHint: '連續空白會合併成一個；彩色 emoji 顯示不出來。',
+    frame: '每字格數 Frame', frameHint: '1 = 逐字跳出；越大捲動越平滑，最多 50。',
+    delay: '每格毫秒 Delay', delayHint: '越小越快；低於 20 會被瀏覽器放慢。',
+    width: '寬度（字）', widthHint: '1 = 50×50 正方形 emoji；越大越寬。',
+    theme: '主題', themeHint: '決定預設的背景和文字顏色。', themeDark: 'dark 黑底白字', themeLight: 'light 白底黑字',
+    color: '文字顏色', colorPh: '依主題', colorHint: '色名或 #hex，例如 red、#ff8800。',
+    flash: '閃爍效果', flashHint: '閃字：背景和字的顏色互換；彩虹：背景輪流換七色。',
+    flashNone: '不閃', flashBlink: '閃字（顏色互換）', flashRainbow: '彩虹背景',
+    flashDelay: '閃爍間隔 (ms)', flashDelayHint: '每隔幾毫秒換一次色，和 Delay 分開算，最短 20。',
     dim: '尺寸', count: '張數', size: '檔案',
     download: '下載 output.gif', previewAlt: 'GIF 預覽',
     footer: 'Slack 自訂 emoji 上限 128 KB。字體用瀏覽器內建的，跟 CLI 版可能略有差異。',
   },
   en: {
     subtitle: 'Turn text into a 50×50 scrolling GIF for Slack custom emoji. Runs entirely in your browser.',
-    text: 'Text', frame: 'Frame (1 = per char)', delay: 'Delay (ms)', width: 'Width (×50px)',
-    theme: 'Theme', color: 'Text color', colorPh: 'theme default',
-    flash: 'Flashing background', flashNone: 'None', flashBlink: 'Swap colors', flashRainbow: 'Rainbow',
-    flashDelay: 'Flash interval (ms)',
+    presets: 'Styles', presetsHint: 'Your text in each style. Click one to use its settings.',
+    pDark: 'White on black', pLight: 'Black on white', pBlink: 'Blink', pRainbow: 'Rainbow',
+    pRainbowBlack: 'Rainbow, black text', pStep: 'One at a time', pStepBlink: 'Blink, one at a time', pGold: 'Gold text',
+    text: 'Text', textHint: 'Runs of spaces collapse into one; color emoji will not show.',
+    frame: 'Frames per char', frameHint: '1 = one character at a time; larger scrolls smoother, up to 50.',
+    delay: 'Delay (ms)', delayHint: 'Per frame; smaller is faster. Below 20, browsers slow it down.',
+    width: 'Width (chars)', widthHint: '1 = 50×50 square emoji; larger is wider.',
+    theme: 'Theme', themeHint: 'Default colors: dark is white on black, light is black on white.', themeDark: 'dark', themeLight: 'light',
+    color: 'Text color', colorPh: 'theme default', colorHint: 'A color name or #hex, e.g. red, #ff8800.',
+    flash: 'Flashing background', flashHint: 'Blink swaps background and text colors; rainbow cycles the background.',
+    flashNone: 'None', flashBlink: 'Blink (swap colors)', flashRainbow: 'Rainbow',
+    flashDelay: 'Flash interval (ms)', flashDelayHint: 'How often the color changes, separate from Delay; at least 20.',
     dim: 'Size', count: 'Frames', size: 'File',
     download: 'Download output.gif', previewAlt: 'GIF preview',
     footer: 'Slack caps custom emoji at 128 KB. Fonts come from your browser, so results may differ slightly from the CLI.',
@@ -323,33 +384,90 @@ function encodeGif(frames, perFramePalette = false) {
   return new Blob([gif.bytes()], { type: 'image/gif' });
 }
 
-let url;
-function update() {
-  const dark = theme.value === 'dark';
+// The form controls that make up a style; text is handled separately so presets keep what the user typed.
+const STYLE_INPUTS = { frame, delay, width, theme, flash, flashDelay, color };
+const DEFAULT_STYLE = { frame: 5, delay: 100, width: 1, theme: 'dark', flash: 'none', flashDelay: 50, color: '' };
+// Same examples as the README gallery.
+const PRESETS = {
+  dark: {},
+  light: { theme: 'light' },
+  blink: { flash: 'blink' },
+  rainbow: { flash: 'rainbow' },
+  rainbowBlack: { flash: 'rainbow', color: 'black' },
+  step: { frame: 1, delay: 500 },
+  stepBlink: { frame: 1, delay: 500, flash: 'blink' },
+  gold: { color: 'gold' },
+};
+for (const p of Object.values(PRESETS)) Object.assign(p, { ...DEFAULT_STYLE, ...p });
+
+const readStyle = () => Object.fromEntries(Object.entries(STYLE_INPUTS).map(([k, el]) => [k, el.value]));
+
+// Returns { frames, blob } for a text + style, or null when there is nothing to draw.
+function makeGif(textValue, s) {
+  const dark = s.theme === 'dark';
   const frames = renderFrames({
-    text: text.value,
-    frame: Math.max(1, +frame.value || 1),
-    width: Math.max(1, +width.value || 1),
+    text: textValue,
+    // above IMAGE_SIZE the scroll step rounds to 0 px and renderFrames would never finish
+    frame: Math.min(IMAGE_SIZE, Math.max(1, +s.frame || 1)),
+    width: Math.max(1, +s.width || 1),
     bg: dark ? 'black' : 'white',
-    fg: color.value.trim() || (dark ? 'white' : 'black'),
-    delay: Math.max(1, +delay.value || 100),
-    flash: flash.value,
-    flashDelay: Math.max(20, +flashDelay.value || 50),
+    fg: String(s.color).trim() || (dark ? 'white' : 'black'),
+    delay: Math.max(1, +s.delay || 100),
+    flash: s.flash,
+    flashDelay: Math.max(20, +s.flashDelay || 50),
   });
-  if (!frames.length) return;
-  const blob = encodeGif(frames, flash.value === 'rainbow');
-  if (url) URL.revokeObjectURL(url);
-  url = URL.createObjectURL(blob);
-  preview.src = url;
-  download.href = url;
-  dim.textContent = `${frames[0].width} × ${frames[0].height}`;
-  count.textContent = frames.length;
-  size.textContent = `${(blob.size / 1024).toFixed(1)} KB`;
-  size.classList.toggle('over', blob.size > SLACK_LIMIT);
+  return frames.length ? { frames, blob: encodeGif(frames, s.flash === 'rainbow') } : null;
 }
 
-for (const el of [text, frame, delay, width, theme, flash, flashDelay, color]) el.addEventListener('input', update);
+let url;
+function update() {
+  const style = readStyle();
+  const gif = makeGif(text.value, style);
+  for (const b of presets.children) {
+    const p = PRESETS[b.dataset.preset];
+    b.setAttribute('aria-pressed', Object.keys(p).every(k => String(p[k]) === String(style[k]).trim()));
+  }
+  if (!gif) return;
+  if (url) URL.revokeObjectURL(url);
+  url = URL.createObjectURL(gif.blob);
+  preview.src = url;
+  download.href = url;
+  dim.textContent = `${gif.frames[0].width} × ${gif.frames[0].height}`;
+  count.textContent = gif.frames.length;
+  size.textContent = `${(gif.blob.size / 1024).toFixed(1)} KB`;
+  size.classList.toggle('over', gif.blob.size > SLACK_LIMIT);
+}
+
+// Preset tiles show the user's own text, so they re-render when it changes (debounced: 8 GIFs per keystroke is too many).
+const tileUrls = {};
+let tileTimer;
+function updateTiles() {
+  clearTimeout(tileTimer);
+  tileTimer = setTimeout(() => {
+    for (const b of presets.children) {
+      const key = b.dataset.preset;
+      const gif = makeGif(text.value, PRESETS[key]);
+      if (tileUrls[key]) URL.revokeObjectURL(tileUrls[key]);
+      tileUrls[key] = gif ? URL.createObjectURL(gif.blob) : '';
+      b.querySelector('img').src = tileUrls[key];
+    }
+  }, 250);
+}
+
+presets.addEventListener('click', e => {
+  const b = e.target.closest('button[data-preset]');
+  if (!b) return;
+  const p = PRESETS[b.dataset.preset];
+  for (const [k, el] of Object.entries(STYLE_INPUTS)) el.value = p[k];
+  update();
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  preview.closest('.card').scrollIntoView({ block: 'nearest', behavior: still ? 'auto' : 'smooth' });
+});
+
+for (const el of Object.values(STYLE_INPUTS)) el.addEventListener('input', update);
+text.addEventListener('input', () => { update(); updateTiles(); });
 update();
+updateTiles();
 
 // ponytail: one check — frame counts must match src/app.py's marquee math
 const n = renderFrames({ text: 'abc', frame: 5, width: 1, bg: '#000', fg: '#fff' }).length;

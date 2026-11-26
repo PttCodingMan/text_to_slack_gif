@@ -29,6 +29,14 @@ def check_positive(value):
     return value
 
 
+def check_frame(value):
+    value = check_positive(value)
+    if value > image_size:
+        # the scroll step is image_size // frame pixels, which would be 0 and never finish
+        raise ArgumentTypeError("%s is too large; frame must be between 1 and %d" % (value, image_size))
+    return value
+
+
 def new_image(width, background_color):
     return Image.new('RGB', (image_size * width, image_size), background_color)
 
@@ -43,6 +51,9 @@ def split_delay(delay, flash_delay):
 
 def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int,
                 background_color: str, flash: str = 'none', flash_delay: int = default_flash_delay):
+    if not 1 <= frame <= image_size:
+        raise ValueError(f'frame must be between 1 and {image_size}, got {frame}')
+
     input_string = ' '.join(text.split())
 
     if font is None:
@@ -136,8 +147,8 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('-t', '--text', help="Any text you want to convert to gif", required=True)
-    parser.add_argument('-f', '--frame', type=check_positive, default=default_frame,
-                        help="Frames number for each text between text")
+    parser.add_argument('-f', '--frame', type=check_frame, default=default_frame,
+                        help="Frames number for each text between text; 1 to %d" % image_size)
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
     parser.add_argument('-c', '--color', type=str, default=None,
                         help="The text HTML/CSS Color Name; string, default: black")
