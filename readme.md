@@ -1,105 +1,154 @@
 # text to slack gif
 
-This is a simple Python script that can convert text to gif in slack format.  
-This script solves the problem that you need to use several online services to do this.  
-And the more important thing is it saves your time!
+把一段文字轉成會捲動的 GIF，直接上傳當 Slack 自訂 emoji。
 
-## Basic usage
+不用再到好幾個線上服務之間轉檔、裁切、壓縮，一個指令（或在 GitHub 上點幾下）就完成。
 
-### Run on GitHub Actions
+![臣亮言 範例](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
 
-1. Fork this repository.
-2. Go to the Actions tab and enable workflows.
-3. Select `build gif` workflow.
-4. Click `Run workflow` button.
-5. Input the text you want to convert, and adjust the other options if you like:
+## 三種用法
 
-   | Option | Description | Default |
-   | --- | --- | --- |
-   | Text | The text to convert | 臣亮言… |
-   | Theme | `dark` (white text on black) or `light` (black text on white) | `dark` |
-   | Flashing background | `none`, `blink` (background and text colors swap every frame) or `rainbow` (background cycles through colors) | `none` |
-   | Flash interval | Milliseconds between background color changes; smaller is faster | `50` |
-   | Text color | HTML/CSS color name or hex (e.g. `red`, `#ff8800`); leave blank to use the theme color | blank |
-   | Frames per character | `1` shows one character at a time; larger values scroll more smoothly | `5` |
-   | Delay | Milliseconds per frame; smaller is faster | `100` |
-   | Width | Image width in characters; `1` is a square emoji | `1` |
-   | File name | Name of the downloaded gif (without `.gif`) | `slack-gif` |
+| 用法 | 適合 | 需要什麼 |
+| --- | --- | --- |
+| [在 GitHub Actions 上跑](#在-github-actions-上跑免安裝) | 不想在電腦上裝 Python | GitHub 帳號 |
+| [網頁版](#網頁版) | 想邊調參數邊看預覽 | 瀏覽器 |
+| [在自己電腦上跑](#在自己電腦上跑) | 常常要產生、想寫成腳本 | Python 3.9 以上 |
 
-6. Download the gif from the Artifacts. The run summary also lists the options that were used.
+## 在 GitHub Actions 上跑（免安裝）
 
-### Run on your local machine
+GIF 會在 GitHub 的機器上產生，跑完再下載回來就好。因為 workflow 只能在你自己有權限的 repo 執行，所以**要先 fork 一份到自己的帳號**。
 
-1. Clone this repository.
-2. Install the required packages.
-3. Run the script.
+### 1. Fork 這個 repo
+
+1. 登入 GitHub，打開 <https://github.com/PttCodingMan/text_to_slack_gif>。
+2. 點右上角的 **Fork**，再按 **Create fork**。
+3. 完成後會跳到 `https://github.com/<你的帳號>/text_to_slack_gif`，接下來的步驟都在這個 fork 裡做。
+
+### 2. 啟用 Actions（只需要做一次）
+
+GitHub 預設會關閉 fork 出來的 repo 的 workflow。
+
+1. 在你的 fork 點上方的 **Actions** 分頁。
+2. 看到 *Workflows aren't being run on this forked repository* 時，按 **I understand my workflows, go ahead and enable them**。
+
+### 3. 執行 `build gif`
+
+1. 在 Actions 分頁左側選 **build gif**。
+2. 點右邊的 **Run workflow** 下拉選單，分支保持 `master`。
+3. 填入文字，其他選項可以照預設，也可以調整（見下方 [選項說明](#選項說明)）。
+4. 按綠色的 **Run workflow**。
+
+### 4. 下載 GIF
+
+1. 等一下下（通常不到一分鐘），列表最上面會出現一筆新的執行紀錄，點進去。
+2. 出現綠色勾勾後，在 **Summary** 頁面可以看到這次用的參數。
+3. 往下捲到 **Artifacts**，點檔名（預設是 `slack-gif`）下載。
+4. 下載下來是 zip 檔，解壓縮就會拿到 `.gif`。
+
+> Artifact 預設保留 90 天，過期就要重跑一次。
+
+### 之後要更新
+
+原作者更新後，在你的 fork 首頁點 **Sync fork** → **Update branch**，就能拿到新功能。
+
+## 網頁版
+
+`docs/index.html` 是純前端的版本，全部在瀏覽器裡跑，可以即時預覽、直接下載。字型用的是瀏覽器內建字型，所以結果可能跟 Python 版略有差異。
+
+想放到線上，可以在你的 fork 開 GitHub Pages：
+
+1. 到 fork 的 **Settings** → **Pages**。
+2. **Source** 選 **Deploy from a branch**，Branch 選 `master`、資料夾選 `/docs`，按 **Save**。
+3. 等一兩分鐘後就能在 `https://<你的帳號>.github.io/text_to_slack_gif/` 打開。
+
+只想在本機用的話，直接用瀏覽器開 `docs/index.html` 也可以（需要連網載入 GIF 編碼套件）。
+
+## 在自己電腦上跑
+
+需要 Python 3.9 以上。
+
+```bash
+git clone https://github.com/PttCodingMan/text_to_slack_gif.git
+```
+
+```bash
+cd text_to_slack_gif
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+```bash
+python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
+```
+
+產生的檔案是目前目錄下的 `output.gif`。
+
+## 選項說明
+
+| GitHub Actions 欄位 | 指令參數 | 說明 | 預設值 |
+| --- | --- | --- | --- |
+| Text | `-t`, `--text` | 要轉成 GIF 的文字（必填） | — |
+| Theme | `--theme` | `dark` 黑底白字、`light` 白底黑字 | `dark` |
+| Flashing background | `--flash` | `none` 不閃、`blink` 背景和文字顏色每格互換、`rainbow` 背景輪流換成彩虹七色 | `none` |
+| Flash interval | `--flash-delay` | 閃背景時每隔幾毫秒換一次顏色，越小閃越快；和 `-d` 互相獨立 | `50` |
+| Text color | `-c`, `--color` | 文字顏色，HTML/CSS 色名或 hex（如 `red`、`#ff8800`），會蓋過主題顏色 | 依主題 |
+| Frames per character | `-f`, `--frame` | 每個字捲動幾格；`1` 是逐字跳出，數字越大捲動越平滑 | `5` |
+| Delay | `-d`, `--delay` | 每格停留幾毫秒，越小越快 | `100` |
+| Width | `-w`, `--width` | 畫面寬度，以「字」為單位；`1` 是 50×50 的正方形 emoji | `1` |
+| File name | — | 下載檔名（不含 `.gif`），只有 Actions 版有 | `slack-gif` |
+
+## 範例
+
+調整 `-f`（每字格數）和 `-d`（每格毫秒數）可以做出不同節奏的效果。
+
+預設：平滑捲動
 
 ```bash
 python3 src/app.py -t "臣亮言..."
 ```
 
-## Advanced usage
+![f 5 d 100](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
 
-However, you can get different type gif by adjusting frame and delay.  
-The default values for frame and delay are 5 and 100 respectively.
-
-```bash
-python3 src/app.py -t "臣亮言..."
-```
-![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
+逐字跳出，每個字停 0.5 秒
 
 ```bash
 python3 src/app.py -f 1 -d 500 -t "臣亮言..."
 ```
-![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%201%20d%20500.gif)
+
+![f 1 d 500](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%201%20d%20500.gif)
+
+快速捲動
 
 ```bash
 python3 src/app.py -d 30 -t "臣亮言..."
 ```
-![image](https://raw.githubusercontent.com/PttCodingMan/text_to_slack_gif/master/src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
 
-## Theme
+![f 5 d 30](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
 
-Add `--theme <dark/light>` argument to change the theme of the gif. Default is `dark`.
-
-- `dark`: Black background with white text.
-- `light`: White background with black text.
+其他組合：
 
 ```bash
+# 白底黑字
 python3 src/app.py --theme light -t "臣亮言..."
-```
 
-## Flashing background
+# 紫色字、5 個字寬的橫幅
+python3 src/app.py -c blueviolet -w 5 -t "臣亮言..."
 
-Add `--flash <none/blink/rainbow>` argument to make the background flash. Default is `none`.
-
-- `none`: No flashing.
-- `blink`: The background and text colors swap every frame, e.g. white on black ↔ black on white.
-- `rainbow`: The background cycles through rainbow colors; the text keeps its color.
-
-Add `--flash-delay <int>` to set how many milliseconds pass between color changes. Default is `50`.
-It is independent of `-d`, so the text can stay put while the background flashes several times.
-
-```bash
+# 單一個字，黑白快速閃爍
 python3 src/app.py -f 1 --flash blink -t "急"
+
+# 彩虹背景
 python3 src/app.py --flash rainbow -t "臣亮言..."
 ```
 
-## Font color
+## 上傳到 Slack
 
-Add `-c <HTML/CSS Color Name>` or `--color=<HTML/CSS Color Name>` argument to change font color; type=str. This will override the default color of the selected theme.
+在 Slack 的訊息輸入框點 emoji 圖示 → **Add Emoji**（新增表情符號），上傳 GIF 並取個名字即可。
 
-```bash
-python3 src/app.py -c blueviolet -t "臣亮言..."
-```
-![image](https://github.com/PersonalComputerRetailer/text_to_slack_gif/blob/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%EF%BC%9A%E5%85%88%20in%20f%205%20d%20100_violet.gif)
+Slack 自訂 emoji 的檔案上限是 128 KB。如果太大，可以縮短文字、把 `-f` 調小，或把 `-d` 調大以減少張數。
 
-## Width of image
+## License
 
-Add `-w <int>` or `--width=<int>` argument to change width of image; type=int. Default is 1. 
-
-```bash
-python3 src/app.py -c blueviolet -w 5 -t "臣亮言..."
-```
-![image](https://github.com/PersonalComputerRetailer/text_to_slack_gif/blob/dev/src/%E8%87%A3%E4%BA%AE%E8%A8%80%EF%BC%9A%E5%85%88%20in%20f%205%20d%20100_violet_w5.gif)
-
+[MIT](LICENSE)
