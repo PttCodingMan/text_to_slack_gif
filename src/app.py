@@ -1,9 +1,10 @@
 import math
 import os
+import re
 import string
 from argparse import ArgumentParser, ArgumentTypeError
 
-from PIL import ImageFont, Image, ImageDraw
+from PIL import ImageColor, ImageFont, Image, ImageDraw
 from SingleLog import Logger
 
 # default value
@@ -37,6 +38,23 @@ def check_frame(value):
     return value
 
 
+def check_color(value):
+    value = value.strip()
+    try:
+        ImageColor.getrgb(value)
+    except ValueError:
+        raise ArgumentTypeError("%r is not a color; use a name like red or a hex code like #ff8800" % value)
+    return value
+
+
+def check_color_list(value):
+    # split on commas outside parentheses, so rgb(255, 0, 0) stays one color
+    colors = [c for c in re.split(r',(?![^()]*\))', value) if c.strip()]
+    if len(colors) < 2:
+        raise ArgumentTypeError("need at least 2 comma-separated colors, got %r" % value)
+    return [check_color(c) for c in colors]
+
+
 def new_image(width, background_color):
     return Image.new('RGB', (image_size * width, image_size), background_color)
 
@@ -50,7 +68,8 @@ def split_delay(delay, flash_delay):
 
 
 def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_color: str, width: int,
-                background_color: str, flash: str = 'none', flash_delay: int = default_flash_delay):
+                background_color: str, flash: str = 'none', flash_delay: int = default_flash_delay,
+                flash_colors=None):
     if not 1 <= frame <= image_size:
         raise ValueError(f'frame must be between 1 and {image_size}, got {frame}')
 
@@ -63,6 +82,9 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
     logger.debug('frame', frame)
     logger.debug('delay', delay)
     logger.debug('flash', flash)
+
+    # backgrounds the rainbow mode cycles through
+    cycle_colors = list(flash_colors or rainbow_colors)
 
     single_full_text_length = image_size
     # load font
@@ -110,12 +132,21 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
         sub_delays = split_delay(delay, flash_delay)
         steps = [(x, t, d) for x, t in draws for d in sub_delays]
 
-        if flash == 'rainbow' and len(steps) < len(rainbow_colors):
+        if flash == 'rainbow' and len(steps) < len(cycle_colors):
             # a short animation repeats until it goes through every color and loops back cleanly
-            steps = steps * (math.lcm(len(steps), len(rainbow_colors)) // len(steps))
+            steps = steps * (math.lcm(len(steps), len(cycle_colors)) // len(steps))
+        elif flash == 'rainbow' and len(cycle_colors) == 2 and len(steps) % 2:
+            # two colors over an odd frame count would show one color twice in a row at the loop
+            steps = steps * 2
         elif flash == 'blink' and len(steps) % 2:
             # an even frame count keeps the blinking steady when the gif loops
             steps = steps * 2
+
+    # background color index for each step of the color cycle
+    cycle_index = [i % len(cycle_colors) for i in range(len(steps))]
+    if flash == 'rainbow' and len(cycle_colors) > 2 and len(steps) % len(cycle_colors) == 1:
+        # the last step would repeat the first color across the loop; the second color fits between both neighbours
+        cycle_index[-1] = 1
 
     images = []
     for i, (x, t, _) in enumerate(steps):
@@ -124,7 +155,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
             # every other frame swaps the background and text colors
             bg, fg = fg, bg
         elif flash == 'rainbow':
-            bg = rainbow_colors[i % len(rainbow_colors)]
+            bg = cycle_colors[cycle_index[i]]
 
         img = new_image(width, bg)
         ImageDraw.Draw(img).text((x, y_offset), t, fill=fg, font=font)
@@ -150,19 +181,27 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--frame', type=check_frame, default=default_frame,
                         help="Frames number for each text between text; 1 to %d" % image_size)
     parser.add_argument('-d', '--delay', type=check_positive, default=default_delay, help="The delay for each frame")
-    parser.add_argument('-c', '--color', type=str, default=None,
-                        help="The text HTML/CSS Color Name; string, default: black")
+    parser.add_argument('-c', '--color', type=check_color, default=None,
+                        help="Text color, an HTML/CSS color name or hex code; overrides the theme")
+    parser.add_argument('-b', '--background', type=check_color, default=None,
+                        help="Background color, an HTML/CSS color name or hex code; overrides the theme")
     parser.add_argument('-w', '--width', type=check_positive, default=default_width,
                         help="The width of image; integer; default: 1")
     parser.add_argument('--theme', type=str, default='dark', choices=['dark', 'light'],
                         help="The theme of the gif; string, default: dark")
     parser.add_argument('--flash', type=str, default='none', choices=flash_modes,
                         help="Flashing background: none, blink (background and text colors swap every frame), "
-                             "rainbow (background cycles through colors); default: none")
+                             "rainbow (color cycle: the background rotates through --flash-colors); default: none")
     parser.add_argument('--flash-delay', type=check_positive, default=default_flash_delay,
                         help="Milliseconds between background color changes when flashing; "
                              "smaller is faster; default: 50")
+    parser.add_argument('--flash-colors', type=check_color_list, default=None,
+                        help="Comma-separated backgrounds for the color cycle (--flash rainbow), "
+                             "e.g. 'red,yellow,blue'; default: the 7 rainbow colors")
     args = parser.parse_args()
+
+    if args.flash_colors and args.flash != 'rainbow':
+        parser.error('--flash-colors only works with --flash rainbow')
 
     if args.theme == 'dark':
         background_color = 'black'
@@ -173,6 +212,8 @@ if __name__ == '__main__':
 
     if args.color:
         text_color = args.color
+    if args.background:
+        background_color = args.background
 
     text_to_gif(args.text, args.frame, args.delay, None, True, text_color, args.width, background_color, args.flash,
-                args.flash_delay)
+                args.flash_delay, args.flash_colors)
