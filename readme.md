@@ -4,6 +4,8 @@
 
 不用再到好幾個線上服務之間轉檔、裁切、壓縮，一個指令（或在 GitHub 上點幾下）就完成。
 
+**線上直接用：<https://pttcodingman.github.io/text_to_slack_gif/>**（免安裝、免 fork，打開瀏覽器就能產生）
+
 | 黑底白字 | 白底黑字 | 閃字 | 彩虹背景 | 單字閃爍 |
 | :---: | :---: | :---: | :---: | :---: |
 | <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="104" alt="白底黑字"> | <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/blink-char.gif" width="100" alt="單字閃爍"> |
@@ -15,8 +17,8 @@
 
 | 用法 | 適合 | 需要什麼 |
 | --- | --- | --- |
+| [網頁版](https://pttcodingman.github.io/text_to_slack_gif/) | 想邊調參數邊看預覽，最快上手 | 瀏覽器就好 |
 | [在 GitHub Actions 上跑](#在-github-actions-上跑免安裝) | 不想在電腦上裝 Python | GitHub 帳號 |
-| [網頁版](#網頁版) | 想邊調參數邊看預覽 | 瀏覽器 |
 | [在自己電腦上跑](#在自己電腦上跑) | 常常要產生、想寫成腳本 | Python 3.9 以上 |
 
 ## 在 GitHub Actions 上跑（免安裝）
@@ -58,9 +60,11 @@ GitHub 預設會關閉 fork 出來的 repo 的 workflow。
 
 ## 網頁版
 
-`docs/index.html` 是純前端的版本，全部在瀏覽器裡跑，可以即時預覽、直接下載。上方的「風格範例」會用你輸入的文字預覽黑底、白底、閃字、彩虹等效果，點一下就套用那組設定；每個欄位下面也有簡短說明。字型用的是瀏覽器內建字型，所以結果可能跟 Python 版略有差異。
+直接打開 <https://pttcodingman.github.io/text_to_slack_gif/> 就能用，不需要 GitHub 帳號，也不用 fork。
 
-想放到線上，可以在你的 fork 開 GitHub Pages：
+網頁版的原始碼是 `docs/index.html`，是純前端的版本，全部在瀏覽器裡跑，可以即時預覽、直接下載。上方的「風格範例」會用你輸入的文字預覽黑底、白底、閃字、彩虹等效果，點一下就套用那組設定；每個欄位下面也有簡短說明。字型用的是瀏覽器內建字型，所以結果可能跟 Python 版略有差異。
+
+想架一份自己的（例如改了程式想自己用），可以在你的 fork 開 GitHub Pages：
 
 1. 到 fork 的 **Settings** → **Pages**。
 2. **Source** 選 **Deploy from a branch**，Branch 選 `master`、資料夾選 `/docs`，按 **Save**。
