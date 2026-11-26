@@ -135,9 +135,18 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
         if flash == 'rainbow' and len(steps) < len(cycle_colors):
             # a short animation repeats until it goes through every color and loops back cleanly
             steps = steps * (math.lcm(len(steps), len(cycle_colors)) // len(steps))
+        elif flash == 'rainbow' and len(cycle_colors) == 2 and len(steps) % 2:
+            # two colors over an odd frame count would show one color twice in a row at the loop
+            steps = steps * 2
         elif flash == 'blink' and len(steps) % 2:
             # an even frame count keeps the blinking steady when the gif loops
             steps = steps * 2
+
+    # background color index for each step of the color cycle
+    cycle_index = [i % len(cycle_colors) for i in range(len(steps))]
+    if flash == 'rainbow' and len(cycle_colors) > 2 and len(steps) % len(cycle_colors) == 1:
+        # the last step would repeat the first color across the loop; the second color fits between both neighbours
+        cycle_index[-1] = 1
 
     images = []
     for i, (x, t, _) in enumerate(steps):
@@ -146,7 +155,7 @@ def text_to_gif(text: str, frame: int, delay: int, font: str, save: bool, text_c
             # every other frame swaps the background and text colors
             bg, fg = fg, bg
         elif flash == 'rainbow':
-            bg = cycle_colors[i % len(cycle_colors)]
+            bg = cycle_colors[cycle_index[i]]
 
         img = new_image(width, bg)
         ImageDraw.Draw(img).text((x, y_offset), t, fill=fg, font=font)
