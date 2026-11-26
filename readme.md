@@ -6,10 +6,10 @@
 
 | 黑底白字 | 白底黑字 | 閃字 | 彩虹背景 | 單字閃爍 |
 | :---: | :---: | :---: | :---: | :---: |
-| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="100" alt="白底黑字"> | <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/blink-char.gif" width="100" alt="單字閃爍"> |
+| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="104" alt="白底黑字"> | <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/blink-char.gif" width="100" alt="單字閃爍"> |
 | 預設 | `--theme light` | `--flash blink` | `--flash rainbow` | `-f 1 -d 500 --flash blink` |
 
-範例圖都是 50×50 的原尺寸放大兩倍顯示，每個選項的更多範例見 [選項說明](#選項說明)。
+範例圖都是 50×50 的原尺寸放大兩倍顯示，每個選項的更多範例見 [選項說明](#選項說明)。白底範例外圍的灰框是為了在白色頁面上看得清楚另外加的，實際產生的 GIF 沒有框。
 
 ## 三種用法
 
@@ -58,7 +58,7 @@ GitHub 預設會關閉 fork 出來的 repo 的 workflow。
 
 ## 網頁版
 
-`docs/index.html` 是純前端的版本，全部在瀏覽器裡跑，可以即時預覽、直接下載。字型用的是瀏覽器內建字型，所以結果可能跟 Python 版略有差異。
+`docs/index.html` 是純前端的版本，全部在瀏覽器裡跑，可以即時預覽、直接下載。上方的「風格範例」會用你輸入的文字預覽黑底、白底、閃字、彩虹等效果，點一下就套用那組設定；每個欄位下面也有簡短說明。字型用的是瀏覽器內建字型，所以結果可能跟 Python 版略有差異。
 
 想放到線上，可以在你的 fork 開 GitHub Pages：
 
@@ -125,7 +125,7 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 
 | `--theme dark`（預設） | `--theme light` |
 | :---: | :---: |
-| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="100" alt="白底黑字"> |
+| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="104" alt="白底黑字"> |
 
 主題只決定「預設」顏色；用 `-c` 指定文字顏色後，背景仍然照主題。
 
