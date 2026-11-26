@@ -95,6 +95,8 @@
   input:hover, select:hover { border-color: #43536e; }
   input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
   input::placeholder { color: #64748b; }
+  input[aria-invalid="true"] { border-color: var(--danger); }
+  input:disabled { opacity: .45; cursor: not-allowed; }
   select {
     appearance: none; cursor: pointer; padding-right: 2rem;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
@@ -169,12 +171,14 @@
     <div class="presets" id="presets">
       <button type="button" data-preset="dark"><img alt=""><span data-i18n="pDark"></span></button>
       <button type="button" data-preset="light"><img alt=""><span data-i18n="pLight"></span></button>
+      <button type="button" data-preset="navyGold"><img alt=""><span data-i18n="pNavyGold"></span></button>
       <button type="button" data-preset="blink"><img alt=""><span data-i18n="pBlink"></span></button>
+      <button type="button" data-preset="alert"><img alt=""><span data-i18n="pAlert"></span></button>
       <button type="button" data-preset="rainbow"><img alt=""><span data-i18n="pRainbow"></span></button>
       <button type="button" data-preset="rainbowBlack"><img alt=""><span data-i18n="pRainbowBlack"></span></button>
+      <button type="button" data-preset="party"><img alt=""><span data-i18n="pParty"></span></button>
       <button type="button" data-preset="step"><img alt=""><span data-i18n="pStep"></span></button>
       <button type="button" data-preset="stepBlink"><img alt=""><span data-i18n="pStepBlink"></span></button>
-      <button type="button" data-preset="gold"><img alt=""><span data-i18n="pGold"></span></button>
     </div>
   </section>
 
@@ -203,7 +207,11 @@
       <label class="field"><span data-i18n="flashDelay"></span><small class="hint" data-i18n="flashDelayHint"></small>
         <input type="number" id="flashDelay" value="50" min="20" step="10"></label>
       <label class="field"><span data-i18n="color"></span><small class="hint" data-i18n="colorHint"></small>
-        <input type="text" id="color" data-i18n-ph="colorPh"></label>
+        <input type="text" id="color" data-i18n-ph="colorPh" autocomplete="off" spellcheck="false"></label>
+      <label class="field"><span data-i18n="background"></span><small class="hint" data-i18n="backgroundHint"></small>
+        <input type="text" id="background" data-i18n-ph="colorPh" autocomplete="off" spellcheck="false"></label>
+      <label class="field"><span data-i18n="flashColors"></span><small class="hint" data-i18n="flashColorsHint"></small>
+        <input type="text" id="flashColors" data-i18n-ph="flashColorsPh" autocomplete="off" spellcheck="false"></label>
     </div>
   </section>
 
@@ -239,13 +247,16 @@ const STRINGS = {
     subtitle: '把文字轉成 50×50 的捲動 GIF，直接當 Slack 自訂 emoji。全部在瀏覽器裡跑。',
     presets: '風格範例', presetsHint: '用你輸入的文字預覽各種效果，點一下就套用那組設定。',
     pDark: '黑底白字', pLight: '白底黑字', pBlink: '閃字', pRainbow: '彩虹背景',
-    pRainbowBlack: '彩虹背景黑字', pStep: '逐字跳出', pStepBlink: '逐字閃爍', pGold: '金色字',
+    pRainbowBlack: '彩虹背景黑字', pStep: '逐字跳出', pStepBlink: '逐字閃爍',
+    pNavyGold: '自訂背景', pAlert: '紅黃閃字', pParty: '自訂彩虹',
     text: '文字', textHint: '連續空白會合併成一個；彩色 emoji 顯示不出來。',
     frame: '每字格數 Frame', frameHint: '1 = 逐字跳出；越大捲動越平滑，最多 50。',
     delay: '每格毫秒 Delay', delayHint: '越小越快；低於 20 會被瀏覽器放慢。',
     width: '寬度（字）', widthHint: '1 = 50×50 正方形 emoji；越大越寬。',
     theme: '主題', themeHint: '決定預設的背景和文字顏色。', themeDark: 'dark 黑底白字', themeLight: 'light 白底黑字',
     color: '文字顏色', colorPh: '依主題', colorHint: '色名或 #hex，例如 red、#ff8800。',
+    background: '背景顏色', backgroundHint: '蓋過主題的背景色；閃字會讓它和文字顏色互換。',
+    flashColors: '彩虹的顏色', flashColorsPh: '彩虹七色', flashColorsHint: '選「彩虹背景」時才能填：輪流的背景色，至少兩個，用逗號分隔。',
     flash: '閃爍效果', flashHint: '閃字：背景和字的顏色互換；彩虹：背景輪流換七色。',
     flashNone: '不閃', flashBlink: '閃字（顏色互換）', flashRainbow: '彩虹背景',
     flashDelay: '閃爍間隔 (ms)', flashDelayHint: '每隔幾毫秒換一次色，和 Delay 分開算，最短 20。',
@@ -257,13 +268,16 @@ const STRINGS = {
     subtitle: 'Turn text into a 50×50 scrolling GIF for Slack custom emoji. Runs entirely in your browser.',
     presets: 'Styles', presetsHint: 'Your text in each style. Click one to use its settings.',
     pDark: 'White on black', pLight: 'Black on white', pBlink: 'Blink', pRainbow: 'Rainbow',
-    pRainbowBlack: 'Rainbow, black text', pStep: 'One at a time', pStepBlink: 'Blink, one at a time', pGold: 'Gold text',
+    pRainbowBlack: 'Rainbow, black text', pStep: 'One at a time', pStepBlink: 'Blink, one at a time',
+    pNavyGold: 'Custom background', pAlert: 'Red & yellow blink', pParty: 'Custom rainbow',
     text: 'Text', textHint: 'Runs of spaces collapse into one; color emoji will not show.',
     frame: 'Frames per char', frameHint: '1 = one character at a time; larger scrolls smoother, up to 50.',
     delay: 'Delay (ms)', delayHint: 'Per frame; smaller is faster. Below 20, browsers slow it down.',
     width: 'Width (chars)', widthHint: '1 = 50×50 square emoji; larger is wider.',
     theme: 'Theme', themeHint: 'Default colors: dark is white on black, light is black on white.', themeDark: 'dark', themeLight: 'light',
     color: 'Text color', colorPh: 'theme default', colorHint: 'A color name or #hex, e.g. red, #ff8800.',
+    background: 'Background color', backgroundHint: 'Overrides the theme; blink swaps it with the text color.',
+    flashColors: 'Rainbow colors', flashColorsPh: '7 rainbow colors', flashColorsHint: 'For rainbow mode: backgrounds to cycle through, two or more, comma-separated.',
     flash: 'Flashing background', flashHint: 'Blink swaps background and text colors; rainbow cycles the background.',
     flashNone: 'None', flashBlink: 'Blink (swap colors)', flashRainbow: 'Rainbow',
     flashDelay: 'Flash interval (ms)', flashDelayHint: 'How often the color changes, separate from Delay; at least 20.',
@@ -303,7 +317,7 @@ function splitDelay(delay, flashDelay) {
 }
 
 // Each returned canvas carries its own .delay in ms.
-function renderFrames({ text, frame, width, bg, fg, delay = 100, flash = 'none', flashDelay = 50 }) {
+function renderFrames({ text, frame, width, bg, fg, delay = 100, flash = 'none', flashDelay = 50, cycle = RAINBOW }) {
   const s = text.split(/\s+/).filter(Boolean).join(' ');
   const make = (fill = bg) => {
     const c = document.createElement('canvas');
@@ -346,10 +360,10 @@ function renderFrames({ text, frame, width, bg, fg, delay = 100, flash = 'none',
     // the background flashes every flashDelay ms, independent of how long the text stays put
     const subDelays = splitDelay(delay, flashDelay);
     steps = draws.flatMap(([x, t]) => subDelays.map(d => [x, t, d]));
-    if (flash === 'rainbow' && steps.length < RAINBOW.length) {
+    if (flash === 'rainbow' && steps.length < cycle.length) {
       // a short animation repeats until it goes through every color and loops back cleanly
       const gcd = (a, b) => (b ? gcd(b, a % b) : a);
-      steps = Array(RAINBOW.length / gcd(steps.length, RAINBOW.length)).fill(steps).flat();
+      steps = Array(cycle.length / gcd(steps.length, cycle.length)).fill(steps).flat();
     } else if (flash === 'blink' && steps.length % 2) {
       // an even frame count keeps the blinking steady when the gif loops
       steps = [...steps, ...steps];
@@ -360,7 +374,7 @@ function renderFrames({ text, frame, width, bg, fg, delay = 100, flash = 'none',
     let [b, f] = [bg, fg];
     // every other frame swaps the background and text colors
     if (flash === 'blink' && i % 2) [b, f] = [fg, bg];
-    else if (flash === 'rainbow') b = RAINBOW[i % RAINBOW.length];
+    else if (flash === 'rainbow') b = cycle[i % cycle.length];
     const [c, d] = make(b);
     d.fillStyle = f;
     d.fillText(t, x, BASELINE);
@@ -385,38 +399,68 @@ function encodeGif(frames, perFramePalette = false) {
 }
 
 // The form controls that make up a style; text is handled separately so presets keep what the user typed.
-const STYLE_INPUTS = { frame, delay, width, theme, flash, flashDelay, color };
-const DEFAULT_STYLE = { frame: 5, delay: 100, width: 1, theme: 'dark', flash: 'none', flashDelay: 50, color: '' };
-// Same examples as the README gallery.
+const STYLE_INPUTS = { frame, delay, width, theme, flash, flashDelay, color, background, flashColors };
+const DEFAULT_STYLE = {
+  frame: 5, delay: 100, width: 1, theme: 'dark', flash: 'none', flashDelay: 50, color: '', background: '', flashColors: '',
+};
+// Mirrors the examples in the README.
 const PRESETS = {
   dark: {},
   light: { theme: 'light' },
+  navyGold: { background: 'navy', color: 'gold' },
   blink: { flash: 'blink' },
+  alert: { frame: 1, delay: 500, flash: 'blink', background: 'red', color: 'yellow' },
   rainbow: { flash: 'rainbow' },
   rainbowBlack: { flash: 'rainbow', color: 'black' },
+  party: { frame: 1, delay: 500, flash: 'rainbow', color: 'black', flashColors: '#ff4fa3, #ffd400, #00d1ff' },
   step: { frame: 1, delay: 500 },
   stepBlink: { frame: 1, delay: 500, flash: 'blink' },
-  gold: { color: 'gold' },
 };
 for (const p of Object.values(PRESETS)) Object.assign(p, { ...DEFAULT_STYLE, ...p });
 
 const readStyle = () => Object.fromEntries(Object.entries(STYLE_INPUTS).map(([k, el]) => [k, el.value]));
 
-// Returns { frames, blob } for a text + style, or null when there is nothing to draw.
-function makeGif(textValue, s) {
+// Canvas silently ignores a color it cannot parse, so check first and fall back instead of drawing the wrong thing.
+const isColor = v => CSS.supports('color', v);
+// Split on commas outside parentheses so rgb(255, 0, 0) stays one color. Same rule as src/app.py.
+const splitColors = v => v.split(/,(?![^()]*\))/).map(c => c.trim()).filter(Boolean);
+
+// Resolves a style's colors; `invalid` lists the fields that were filled in but could not be used.
+function resolveColors(s) {
   const dark = s.theme === 'dark';
+  const invalid = [];
+  const pick = (key, fallback) => {
+    const v = String(s[key]).trim();
+    if (!v) return fallback;
+    if (isColor(v)) return v;
+    invalid.push(key);
+    return fallback;
+  };
+  const fg = pick('color', dark ? 'white' : 'black');
+  const bg = pick('background', dark ? 'black' : 'white');
+  let cycle = RAINBOW;
+  const list = splitColors(String(s.flashColors));
+  if (list.length) {
+    if (list.length >= 2 && list.every(isColor)) cycle = list;
+    else invalid.push('flashColors');
+  }
+  return { fg, bg, cycle, invalid };
+}
+
+// Returns { frames, blob, invalid } for a text + style; frames is empty when there is nothing to draw.
+function makeGif(textValue, s) {
+  const { fg, bg, cycle, invalid } = resolveColors(s);
   const frames = renderFrames({
     text: textValue,
     // above IMAGE_SIZE the scroll step rounds to 0 px and renderFrames would never finish
     frame: Math.min(IMAGE_SIZE, Math.max(1, +s.frame || 1)),
     width: Math.max(1, +s.width || 1),
-    bg: dark ? 'black' : 'white',
-    fg: String(s.color).trim() || (dark ? 'white' : 'black'),
+    bg, fg, cycle,
     delay: Math.max(1, +s.delay || 100),
     flash: s.flash,
     flashDelay: Math.max(20, +s.flashDelay || 50),
   });
-  return frames.length ? { frames, blob: encodeGif(frames, s.flash === 'rainbow') } : null;
+  return { frames, invalid, blob: frames.length ? encodeGif(frames, s.flash === 'rainbow') : null };
 }
 
 let url;
@@ -427,7 +471,12 @@ function update() {
     const p = PRESETS[b.dataset.preset];
     b.setAttribute('aria-pressed', Object.keys(p).every(k => String(p[k]) === String(style[k]).trim()));
   }
-  if (!gif) return;
+  for (const key of ['color', 'background', 'flashColors']) {
+    STYLE_INPUTS[key].setAttribute('aria-invalid', gif.invalid.includes(key));
+  }
+  // rainbow colors only mean something in rainbow mode
+  flashColors.disabled = style.flash !== 'rainbow';
+  if (!gif.blob) return;
   if (url) URL.revokeObjectURL(url);
   url = URL.createObjectURL(gif.blob);
   preview.src = url;
@@ -438,7 +487,7 @@ function update() {
   size.classList.toggle('over', gif.blob.size > SLACK_LIMIT);
 }
 
-// Preset tiles show the user's own text, so they re-render when it changes (debounced: 8 GIFs per keystroke is too many).
+// Preset tiles show the user's own text, so they re-render when it changes (debounced: 10 GIFs per keystroke is too many).
 const tileUrls = {};
 let tileTimer;
 function updateTiles() {
@@ -448,7 +497,7 @@ function updateTiles() {
       const key = b.dataset.preset;
       const gif = makeGif(text.value, PRESETS[key]);
       if (tileUrls[key]) URL.revokeObjectURL(tileUrls[key]);
-      tileUrls[key] = gif ? URL.createObjectURL(gif.blob) : '';
+      tileUrls[key] = gif.blob ? URL.createObjectURL(gif.blob) : '';
       b.querySelector('img').src = tileUrls[key];
     }
   }, 250);
