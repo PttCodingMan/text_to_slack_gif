@@ -144,7 +144,7 @@
       <input type="text" id="text" value="臣亮言 先帝創業未半 而中道崩殂">
     </label>
     <div class="grid">
-      <label class="field"><span data-i18n="frame"></span><input type="number" id="frame" value="5" min="1"></label>
+      <label class="field"><span data-i18n="frame"></span><input type="number" id="frame" value="5" min="1" max="50"></label>
       <label class="field"><span data-i18n="delay"></span><input type="number" id="delay" value="100" min="1"></label>
       <label class="field"><span data-i18n="width"></span><input type="number" id="width" value="1" min="1"></label>
       <label class="field"><span data-i18n="theme"></span>
@@ -328,7 +328,8 @@ function update() {
   const dark = theme.value === 'dark';
   const frames = renderFrames({
     text: text.value,
-    frame: Math.max(1, +frame.value || 1),
+    // above IMAGE_SIZE the scroll step rounds to 0 px and renderFrames would never finish
+    frame: Math.min(IMAGE_SIZE, Math.max(1, +frame.value || 1)),
     width: Math.max(1, +width.value || 1),
     bg: dark ? 'black' : 'white',
     fg: color.value.trim() || (dark ? 'white' : 'black'),
