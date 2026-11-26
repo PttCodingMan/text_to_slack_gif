@@ -4,7 +4,12 @@
 
 不用再到好幾個線上服務之間轉檔、裁切、壓縮，一個指令（或在 GitHub 上點幾下）就完成。
 
-![臣亮言 範例](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
+| 黑底白字 | 白底黑字 | 閃字 | 彩虹背景 | 單字閃爍 |
+| :---: | :---: | :---: | :---: | :---: |
+| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="100" alt="白底黑字"> | <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/blink-char.gif" width="100" alt="單字閃爍"> |
+| 預設 | `--theme light` | `--flash blink` | `--flash rainbow` | `-f 1 -d 500 --flash blink` |
+
+範例圖都是 50×50 的原尺寸放大兩倍顯示，每個選項的更多範例見 [選項說明](#選項說明)。
 
 ## 三種用法
 
@@ -118,6 +123,10 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 | `dark` | 黑 | 白 |
 | `light` | 白 | 黑 |
 
+| `--theme dark`（預設） | `--theme light` |
+| :---: | :---: |
+| <img src="examples/dark.gif" width="100" alt="黑底白字"> | <img src="examples/light.gif" width="100" alt="白底黑字"> |
+
 主題只決定「預設」顏色；用 `-c` 指定文字顏色後，背景仍然照主題。
 
 ### 文字顏色 `-c` / Text color
@@ -128,6 +137,10 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 - 16 進位：`#f80`、`#ff8800`
 - 函式：`rgb(255, 136, 0)`、`hsl(32, 100%, 50%)`
 
+| `-c gold` |
+| :---: |
+| <img src="examples/color.gif" width="100" alt="黑底金字"> |
+
 寫錯色名會直接報錯（`unknown color specifier`），在 Actions 上會看到執行失敗的紅叉。
 
 ### 捲動方式 `-f` / Frames per character
@@ -136,6 +149,10 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 
 - **`-f 1`：逐字跳出。** 一格顯示一個字，像跑馬燈一樣一個字一個字換。適合短詞，或搭配閃爍做「急」、「讚」這類單字 emoji。
 - **`-f 2` 以上：平滑捲動。** 整串文字從右往左滑過畫面，每個字要滑 `f` 格才會完全移過去。數字越大越平滑，但張數也越多（大約是「字數 × f」張）。
+
+| `-f 1 -d 500`：逐字跳出 | `-f 5`（預設）：平滑捲動 |
+| :---: | :---: |
+| <img src="examples/step.gif" width="100" alt="逐字跳出"> | <img src="examples/dark.gif" width="100" alt="平滑捲動"> |
 
 可以填 `1`～`50`，建議用 `1`～`10`。畫面只有 50 px 寬，每格至少要移動 1 px，所以上限是 `50`：指令版和 Actions 填超過會直接報錯，網頁版則會自動當成 `50`。
 
@@ -148,14 +165,22 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 - GIF 的時間單位是 10 毫秒，數值會被四捨五入到 10 的倍數。
 - 很多瀏覽器和 App 會把 20 毫秒以下的格子放慢成 100 毫秒，所以 `-d` 不要低於 `20`。
 
+| `-d 100`（預設） | `-d 30`：快速捲動 |
+| :---: | :---: |
+| <img src="examples/dark.gif" width="100" alt="預設速度"> | <img src="examples/fast.gif" width="100" alt="快速捲動"> |
+
 ### 寬度 `-w` / Width
 
 畫面寬度，以「字」為單位，高度固定 50 px：
 
 - `-w 1`：50×50 正方形，最適合當 emoji。
-- `-w 5`：250×50 的橫幅，一次能看到好幾個字，適合搭配捲動模式。
+- `-w 4`：200×50 的橫幅，一次能看到好幾個字，適合搭配捲動模式。
 
 逐字模式（`-f 1`）的字只會出現在最左邊那格，所以寬度大於 1 時建議用捲動模式。
+
+`-w 4`：
+
+<img src="examples/wide.gif" width="400" alt="200×50 橫幅">
 
 ### 閃爍效果 `--flash` / Flashing background
 
@@ -166,6 +191,12 @@ python3 src/app.py -t "臣亮言：先帝創業未半，而中道崩殂"
 | `none` | 不閃（預設） |
 | `blink` | **背景和文字顏色互換**：黑底白字 ↔ 白底黑字輪流切換，看起來字和背景一起在閃。有設 `-c` 的話就是兩個顏色互換，例如 `-c red` 會變成黑底紅字 ↔ 紅底黑字。 |
 | `rainbow` | **背景輪流換成彩虹七色**（紅、橙、黃、綠、青、藍、紫），文字顏色不變。白字在亮色背景上比較不明顯，可以用 `-c black` 之類的深色字試試。 |
+
+| `--flash blink` | `--flash rainbow` | `--flash rainbow -c black` | `-f 1 -d 500 --flash blink` | `-f 1 -d 500 --flash rainbow` |
+| :---: | :---: | :---: | :---: | :---: |
+| <img src="examples/blink.gif" width="100" alt="閃字"> | <img src="examples/rainbow.gif" width="100" alt="彩虹背景"> | <img src="examples/rainbow-black.gif" width="100" alt="彩虹背景黑字"> | <img src="examples/blink-char.gif" width="100" alt="急 閃爍"> | <img src="examples/rainbow-char.gif" width="100" alt="讚 彩虹"> |
+
+後兩個是單一個字（「急」、「讚」）配逐字模式，最常拿來當 emoji。
 
 **閃爍速度 `--flash-delay` / Flash interval**
 
@@ -183,48 +214,34 @@ python3 src/app.py -f 1 -d 500 --flash blink --flash-delay 50 -t "急"
 - 如果 `--flash-delay` 比 `-d` 還大，就是每格換一次色，閃爍速度等於文字移動速度。
 - 閃爍會讓張數變成好幾倍，檔案也會跟著變大。為了讓循環播放時不會斷拍，`blink` 會讓總張數維持偶數；很短的 `rainbow` 動畫會重複到七個顏色都輪過一次。
 
-## 範例
+## 範例指令
 
-調整 `-f`（每字格數）和 `-d`（每格毫秒數）可以做出不同節奏的效果。
-
-預設：平滑捲動
+上面的範例圖都放在 [`examples/`](examples)，用下面的指令產生（產生的檔案都叫 `output.gif`）：
 
 ```bash
-python3 src/app.py -t "臣亮言..."
-```
+# 黑底白字（預設）
+python3 src/app.py -t "臣亮言：先帝創業未半"
 
-![f 5 d 100](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%20100.gif)
-
-逐字跳出，每個字停 0.5 秒
-
-```bash
-python3 src/app.py -f 1 -d 500 -t "臣亮言..."
-```
-
-![f 1 d 500](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%201%20d%20500.gif)
-
-快速捲動
-
-```bash
-python3 src/app.py -d 30 -t "臣亮言..."
-```
-
-![f 5 d 30](src/%E8%87%A3%E4%BA%AE%E8%A8%80%20in%20f%205%20d%2030.gif)
-
-其他組合：
-
-```bash
 # 白底黑字
-python3 src/app.py --theme light -t "臣亮言..."
+python3 src/app.py --theme light -t "臣亮言：先帝創業未半"
 
-# 紫色字、5 個字寬的橫幅
-python3 src/app.py -c blueviolet -w 5 -t "臣亮言..."
+# 閃字：黑底白字 ↔ 白底黑字互換
+python3 src/app.py --flash blink -t "臣亮言：先帝創業未半"
 
-# 單一個字，黑白快速閃爍
-python3 src/app.py -f 1 --flash blink -t "急"
+# 彩虹背景，黑字
+python3 src/app.py --flash rainbow -c black -t "臣亮言：先帝創業未半"
 
-# 彩虹背景
-python3 src/app.py --flash rainbow -t "臣亮言..."
+# 單一個字，每 0.5 秒一輪，背景快速閃爍
+python3 src/app.py -f 1 -d 500 --flash blink -t "急"
+
+# 金色字
+python3 src/app.py -c gold -t "臣亮言：先帝創業未半"
+
+# 逐字跳出
+python3 src/app.py -f 1 -d 500 -t "臣亮言：先帝創業未半"
+
+# 4 個字寬的橫幅
+python3 src/app.py -w 4 -t "臣亮言：先帝創業未半"
 ```
 
 ## 上傳到 Slack
